@@ -3,87 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0a5c26">
-<title>ERAVUR EGG CENTRE</title>
-<style>
-*{box-sizing:border-box;font-family:system-ui}
-body{margin:0;background:#f1f8e9;padding-bottom:80px}
-.header{background:#0a5c26;color:white;padding:16px;text-align:center;position:sticky;top:0}
-.card{background:white;margin:12px;border-radius:16px;padding:16px;box-shadow:0 2px 12px #0001}
-.label{font-weight:bold;color:#0a5c26;font-size:13px;margin-bottom:6px;display:block}
-input,select{width:100%;padding:13px;border:1.5px solid #c8e6c9;border-radius:10px;font-size:15px}
-.row{display:flex;gap:8px;margin:8px 0}.row>*{flex:1}
-.btn{background:#0a5c26;color:white;padding:15px;border:none;border-radius:12px;font-weight:bold;width:100%;margin-top:10px}
-.qty-box{display:flex;border:1.5px solid #c8e6c9;border-radius:10px;overflow:hidden}
-.qty-box button{width:40px;height:42px;border:none;background:#f1f8e9;font-size:20px;font-weight:bold}
-.qty-box input{text-align:center;border:none}
-.total-box{background:#e8f5e9;border:2px dashed #0a5c26;border-radius:12px;padding:12px;text-align:center}
-.total-box b{font-size:20px;color:#0a5c26}
-.bill-item{border-left:4px solid #0a5c26;padding:10px;background:#fafafa;border-radius:8px;margin:6px 0}
-</style>
+<title>ERAVUR EGG ONLINE</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;700&display=swap');body{font-family:'Noto Sans Tamil',system-ui}</style>
 </head>
-<body>
-<div class="header">
-<h1>🥚 ERAVUR EGG CENTRE</h1>
-<small>0755032253 - ஏறாவூர்</small>
+<body class="bg-[#f4f7f2] pb-[90px]">
+<div class="bg-[#0a5c26] text-white p-4 sticky top-0 z-50">
+<div class="flex justify-between"><h1 class="text-xl font-bold">ERAVUR EGG CENTRE</h1><button onclick="openAdmin()" class="bg-white/20 px-3 py-1.5 rounded-full text-xs">Admin</button></div>
+<div class="mt-3 flex gap-2"><input id="search" oninput="renderShops()" placeholder="தேடு..." class="flex-1 px-4 py-2.5 rounded-full text-black text-sm outline-none"><button onclick="openAddShop()" class="bg-yellow-400 text-black px-4 py-2.5 rounded-full font-bold text-sm">+ புது கடை</button></div>
 </div>
-
-<div class="card">
-<span class="label">கடை பெயர் / Customer</span>
-<input id="shop" placeholder="Maryam Bakery">
-<div class="row">
-<div><span class="label">Phone</span><input id="phone" placeholder="9475..."></div>
-<div><span class="label">பழைய பாக்கி</span><input id="oldBal" type="number" value="0" oninput="calc()"></div>
+<div class="flex gap-2 p-3 overflow-x-auto">
+<button onclick="setArea('ALL')" id="tab-ALL" class="bg-[#0a5c26] text-white whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold border">ALL</button>
+<button onclick="setArea('Oddamavadi')" id="tab-Oddamavadi" class="bg-white whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold border">Oddamavadi (10)</button>
+<button onclick="setArea('Chenkalady')" id="tab-Chenkalady" class="bg-white whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold border">Chenkalady (11)</button>
+<button onclick="setArea('Eravur')" id="tab-Eravur" class="bg-white whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold border">Eravur (10)</button>
 </div>
+<div id="shopList" class="px-3 space-y-3"></div>
+<div class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around text-center">
+<div><div class="text-[11px] text-gray-500">மொத்த பாக்கி</div><div id="totBalance" class="font-bold text-[#0a5c26]">Rs. 0</div></div>
+<div><div class="text-[11px] text-gray-500">இன்றைய விற்பனை</div><div id="totToday" class="font-bold">Rs. 0</div></div>
+<div><button onclick="exportSheet()" class="bg-[#0a5c26] text-white px-4 py-2 rounded-full text-xs">Export</button></div>
 </div>
-
-<div class="card">
-<span class="label">முட்டை - 240/260/280/300</span>
-<div id="eggRows"></div>
-<div class="total-box">
-<div>இன்றைய பில்: Rs. <span id="todayTot">0</span></div>
-<b id="grandTot">Rs. 0</b> - மொத்த பாக்கி
-<div style="font-size:12px" id="eggInfo"></div>
-</div>
-<button class="btn" onclick="saveBill()">💾 Save & WhatsApp அனுப்பு</button>
-<button class="btn" style="background:#555" onclick="window.print()">🖨️ Print</button>
-</div>
-
-<div class="card">
-<span class="label">History - Phone இல் Save ஆகும்</span>
-<div id="history"></div>
-</div>
-
+<div id="addModal" class="hidden fixed inset-0 bg-black/50 z-[60] flex items-end justify-center p-0"><div class="bg-white w-full rounded-t-[20px] p-5"><h3 class="font-bold text-lg mb-3">புது கடை சேர்</h3><input id="newName" class="w-full border-2 border-green-100 rounded-xl p-3 mb-2 text-sm" placeholder="கடை பெயர் *"><select id="newArea" class="w-full border-2 border-green-100 rounded-xl p-3 mb-2 text-sm"><option>Oddamavadi</option><option>Chenkalady</option><option>Eravur</option></select><input id="newPhone" class="w-full border-2 border-green-100 rounded-xl p-3 mb-2 text-sm" placeholder="Phone"><input id="newOld" type="number" class="w-full border-2 border-green-100 rounded-xl p-3 mb-3 text-sm" placeholder="பழைய பாக்கி" value="0"><div class="flex gap-2"><button onclick="closeAddShop()" class="flex-1 bg-gray-100 py-3 rounded-xl font-bold">Cancel</button><button onclick="saveNewShop()" class="flex-1 bg-[#0a5c26] text-white py-3 rounded-xl font-bold">Save</button></div></div></div>
+<div id="saleModal" class="hidden fixed inset-0 bg-black/50 z-[60] flex items-end justify-center p-0"><div class="bg-white w-full rounded-t-[20px] p-5 max-h-[90vh] overflow-y-auto"><div class="flex justify-between mb-3"><h3 id="saleTitle" class="font-bold text-lg"></h3><span id="saleOld" class="text-xs bg-yellow-100 px-2 py-1 rounded"></span></div><div id="eggInputs" class="space-y-2"></div><div class="mt-3 p-3 bg-green-50 border-2 border-dashed border-[#0a5c26] rounded-xl text-center"><div class="text-xs">Bill: <span id="saleToday" class="font-bold">0</span> | Total: <span id="saleGrand" class="font-bold text-[#0a5c26] text-lg">0</span></div><div id="saleDetails" class="text-[11px] text-gray-600 mt-1"></div></div><div class="flex gap-2 mt-3"><button onclick="closeSale()" class="flex-1 bg-gray-100 py-3 rounded-xl font-bold">Cancel</button><button onclick="confirmSale()" class="flex-1 bg-[#0a5c26] text-white py-3 rounded-xl font-bold">Save & WA</button></div></div></div>
+<div id="payModal" class="hidden fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4"><div class="bg-white w-full max-w-sm rounded-[20px] p-5"><h3 id="payTitle" class="font-bold text-lg mb-3"></h3><input id="payAmount" type="number" class="w-full border-2 border-green-100 rounded-xl p-3 mb-3 text-lg font-bold" placeholder="Paid Amount"><div id="payInfo" class="text-sm bg-blue-50 p-3 rounded-xl mb-3"></div><div class="flex gap-2"><button onclick="closePay()" class="flex-1 bg-gray-100 py-3 rounded-xl font-bold">Cancel</button><button onclick="confirmPay()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold">Paid</button></div></div></div>
+<div id="reportModal" class="hidden fixed inset-0 bg-white z-[70] overflow-y-auto"><div class="bg-[#0a5c26] text-white p-4 flex justify-between"><h3 id="repTitle" class="font-bold"></h3><button onclick="closeReport()" class="bg-white/20 px-3 py-1 rounded-full">X</button></div><div id="repContent" class="p-4"></div></div>
 <script>
-const sizes=[240,260,280,300];
-let state={}; sizes.forEach(s=>state[s]={qty:0,price:s==240?24:s==260?26:s==280?28:30});
-function renderRows(){
- let html=''; sizes.forEach(s=>{
-  html+=`<div class="row" style="align-items:center"><div style="font-weight:bold;width:80px">W ${s}</div><div class="qty-box"><button onclick="chg(${s},-1)">-</button><input id="q${s}" type="number" value="${state[s].qty}" oninput="state[${s}].qty=parseInt(this.value)||0;calc()"><button onclick="chg(${s},1)">+</button></div><input id="p${s}" type="number" value="${state[s].price}" style="max-width:80px" oninput="state[${s}].price=parseFloat(this.value)||0;calc()"></div>`;
- }); document.getElementById('eggRows').innerHTML=html;
-}
-function chg(s,d){state[s].qty=Math.max(0,state[s].qty+d);document.getElementById('q'+s).value=state[s].qty;calc();}
-function calc(){
- let today=0,eggs=0,det=[]; sizes.forEach(s=>{
-  let q=state[s].qty,p=state[s].price; let e=s*q; let amt=e*p; today+=amt; eggs+=e; if(q>0) det.push(`${s}x${q}=${e}`);
- });
- let old=parseFloat(document.getElementById('oldBal').value)||0;
- document.getElementById('todayTot').innerText=today.toLocaleString();
- document.getElementById('grandTot').innerText='Rs. '+(today+old).toLocaleString();
- document.getElementById('eggInfo').innerText=det.join(' | ')+' | Eggs:'+eggs;
- return {today,grand:today+old,eggs,details:det};
-}
-let bills=JSON.parse(localStorage.getItem('eravur_bills')||'[]');
-function saveBill(){
- let shop=document.getElementById('shop').value||'Customer'; let ph=document.getElementById('phone').value; let d=calc();
- if(d.today==0) return alert('Qty podunga');
- let rec={shop,grand:d.grand,today:d.today,old:document.getElementById('oldBal').value,date:new Date().toLocaleString(),details:d.details.join(',')};
- bills.unshift(rec); localStorage.setItem('eravur_bills',JSON.stringify(bills)); render();
- let msg=`ERAVUR EGG CENTRE\n${shop} - Today Rs.${d.today} Old Rs.${rec.old} Total Rs.${d.grand} - ${d.details.join(',')}`;
- if(ph){ let num=ph.replace(/[^0-9]/g,''); if(num.length==9) num='94'+num; window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg)); } else alert(msg);
-}
-function render(){ document.getElementById('history').innerHTML=bills.slice(0,10).map(b=>`<div class="bill-item"><b>${b.shop}</b> Rs.${b.grand}<br><small>${b.date} ${b.details}</small></div>`).join(''); }
-renderRows();calc();render();
+const DEFAULT=[{area:"Oddamavadi",name:"ரஹுமான் ஹாஜியார்"},{area:"Oddamavadi",name:"ஜாமல்"},{area:"Oddamavadi",name:"post office கடை"},{area:"Oddamavadi",name:"ராபி டா நானா"},{area:"Oddamavadi",name:"ஹார்ட். கடை"},{area:"Oddamavadi",name:"மீரவோடை கடை"},{area:"Oddamavadi",name:"மீரவோடை புது கடை"},{area:"Oddamavadi",name:"அபுபக்கர்"},{area:"Oddamavadi",name:"வாளச்சேனை மரக்கறி கடை"},{area:"Oddamavadi",name:"ஜீவா"},{area:"Chenkalady",name:"R. தம்பி"},{area:"Chenkalady",name:"நிரோஷன்"},{area:"Chenkalady",name:"ஆனந்தன்"},{area:"Chenkalady",name:"வெற்றில கடை"},{area:"Chenkalady",name:"வசந்தன்"},{area:"Chenkalady",name:"ரஜனி மகன்"},{area:"Chenkalady",name:"கருவாட்டு கடை"},{area:"Chenkalady",name:"பிரபாஸ் hotel"},{area:"Chenkalady",name:"மலர் food city"},{area:"Chenkalady",name:"Bar. MA"},{area:"Chenkalady",name:"மதுராம் hotel"},{area:"Eravur",name:"ரிபாஸ்"},{area:"Eravur",name:"மன்சூர்"},{area:"Eravur",name:"மன்சூர் 2"},{area:"Eravur",name:"சபீர் மௌலவி"},{area:"Eravur",name:"பதுரியா 1"},{area:"Eravur",name:"புகாரி மருமகன்"},{area:"Eravur",name:"colombu store"},{area:"Eravur",name:"நதிர்"},{area:"Eravur",name:"நஜீம்"},{area:"Eravur",name:"மௌனுதீன்"}];
+let shops=JSON.parse(localStorage.getItem('egg_shops_v2')||'null'); if(!shops){shops=DEFAULT.map((s,i)=>({id:Date.now()+i,...s,phone:"",oldBalance:0,balance:0,totalSale:0,totalPaid:0}));localStorage.setItem('egg_shops_v2',JSON.stringify(shops));}
+let tx=JSON.parse(localStorage.getItem('egg_tx_v2')||'[]'); let curArea='ALL'; let curShopId=null; let saleState={}; const sizes=[240,260,280,300]; const rates={240:24,260:26,280:28,300:30};
+function save(){localStorage.setItem('egg_shops_v2',JSON.stringify(shops));localStorage.setItem('egg_tx_v2',JSON.stringify(tx));}
+function setArea(a){curArea=a; document.querySelectorAll('[id^=tab-]').forEach(b=>{b.className='bg-white whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold border';}); document.getElementById('tab-'+a).className='bg-[#0a5c26] text-white whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold border'; renderShops();}
+function renderShops(){let q=document.getElementById('search').value.toLowerCase(); let filtered=shops.filter(s=>(curArea=='ALL'||s.area==curArea)&&s.name.toLowerCase().includes(q)); let html=''; filtered.forEach(s=>{let last=tx.filter(t=>t.shopId==s.id)[0]; html+=`<div class="bg-white rounded-[16px] p-4 border-l-[5px] border-[#0a5c26] shadow"><div class="flex justify-between"><div><div class="font-bold text-[15px]">${s.name} <span class="text-[10px] bg-gray-100 px-2 py-0.5 rounded-full">${s.area}</span></div><div class="text-[11px] text-gray-500 mt-1">📞 ${s.phone||'No Phone'} | Old: Rs.${s.oldBalance} | <b class="text-[#0a5c26]">Bal Rs.${s.balance.toLocaleString()}</b></div>${last?`<div class="text-[10px] text-gray-400">Last: ${last.dateStr} Rs.${last.total||last.amount}</div>`:''}</div><button onclick="editShop(${s.id})" class="text-gray-400">✏️</button></div><div class="grid grid-cols-4 gap-2 mt-3"><button onclick="openSale(${s.id})" class="bg-[#0a5c26] text-white py-2.5 rounded-xl text-xs font-bold">Sale</button><button onclick="openPay(${s.id})" class="bg-blue-600 text-white py-2.5 rounded-xl text-xs font-bold">Paid</button><button onclick="openReport(${s.id})" class="bg-gray-100 py-2.5 rounded-xl text-xs font-bold">Report</button><button onclick="waShop(${s.id})" class="bg-green-500 text-white py-2.5 rounded-xl text-xs font-bold">WA</button></div></div>`;}); document.getElementById('shopList').innerHTML=html||'<div class="text-center py-10 text-gray-400">கடை இல்லை</div>'; let totBal=shops.reduce((a,b)=>a+b.balance,0); let todayStr=new Date().toLocaleDateString(); let totToday=tx.filter(t=>t.dateStr==todayStr&&t.type=='sale').reduce((a,b)=>a+b.total,0); document.getElementById('totBalance').innerText='Rs.'+totBal.toLocaleString(); document.getElementById('totToday').innerText='Rs.'+totToday.toLocaleString();}
+function openAddShop(){document.getElementById('addModal').classList.remove('hidden');} function closeAddShop(){document.getElementById('addModal').classList.add('hidden');}
+function saveNewShop(){let n=document.getElementById('newName').value.trim(); if(!n) return alert('பெயர்'); let a=document.getElementById('newArea').value; let p=document.getElementById('newPhone').value; let o=parseFloat(document.getElementById('newOld').value)||0; shops.unshift({id:Date.now(),name:n,area:a,phone:p,oldBalance:o,balance:o,totalSale:0,totalPaid:0}); save(); closeAddShop(); renderShops(); document.getElementById('newName').value='';}
+function editShop(id){let s=shops.find(x=>x.id==id); let np=prompt('Phone',s.phone); if(np===null) return; let ob=prompt('Old Balance',s.oldBalance); if(ob===null) return; let diff=(parseFloat(ob)||0)-s.oldBalance; s.phone=np; s.oldBalance=parseFloat(ob)||0; s.balance+=diff; save(); renderShops();}
+function openSale(id){curShopId=id; saleState={}; sizes.forEach(sz=>saleState[sz]={qty:0,rate:rates[sz]}); let s=shops.find(x=>x.id==id); document.getElementById('saleTitle').innerText=s.name; document.getElementById('saleOld').innerText='Bal Rs.'+s.balance; let h=''; sizes.forEach(sz=>{h+=`<div class="flex items-center gap-2"><div class="w-[70px] font-bold text-sm">W ${sz}</div><div class="flex-1 flex border-2 border-green-100 rounded-xl overflow-hidden"><button onclick="chgSale(${sz},-1)" class="px-3 py-2 bg-green-50 font-bold">-</button><input id="qs${sz}" type="number" value="0" oninput="saleState[${sz}].qty=parseInt(this.value)||0;calcSale()" class="flex-1 text-center outline-none font-bold"><button onclick="chgSale(${sz},1)" class="px-3 py-2 bg-green-50 font-bold">+</button></div><input id="rs${sz}" type="number" value="${rates[sz]}" oninput="saleState[${sz}].rate=parseFloat(this.value)||0;calcSale()" class="w-[70px] border-2 border-green-100 rounded-xl p-2 text-sm text-center"></div>`;}); document.getElementById('eggInputs').innerHTML=h; calcSale(); document.getElementById('saleModal').classList.remove('hidden');}
+function chgSale(sz,d){saleState[sz].qty=Math.max(0,saleState[sz].qty+d); document.getElementById('qs'+sz).value=saleState[sz].qty; calcSale();}
+function calcSale(){let s=shops.find(x=>x.id==curShopId); let today=0,eggs=0,det=[]; sizes.forEach(sz=>{let q=saleState[sz].qty,r=saleState[sz].rate; let e=sz*q; today+=e*r; eggs+=e; if(q>0) det.push(`W${sz}x${q}=${e}`);}); document.getElementById('saleToday').innerText=today.toLocaleString(); document.getElementById('saleGrand').innerText='Rs.'+(today+s.balance).toLocaleString(); document.getElementById('saleDetails').innerText=det.join(' | ')+' | Eggs:'+eggs; return {today,grand:today+s.balance,eggs,det};}
+function closeSale(){document.getElementById('saleModal').classList.add('hidden');}
+function confirmSale(){let c=calcSale(); if(c.today==0) return alert('Qty'); let s=shops.find(x=>x.id==curShopId); s.balance=c.grand; s.totalSale+=c.today; let rec={id:Date.now(),shopId:s.id,shopName:s.name,area:s.area,type:'sale',total:c.today,balance:c.grand,eggs:c.eggs,details:c.det.join(', '),date:new Date().toISOString(),dateStr:new Date().toLocaleDateString()}; tx.unshift(rec); save(); closeSale(); renderShops(); let msg=`ERAVUR EGG\n${s.name} (${s.area})\n${c.det.join('\n')}\nEggs:${c.eggs}\nBill:Rs.${c.today}\nTotal Bal:Rs.${c.grand}`; if(s.phone){let num=s.phone.replace(/[^0-9]/g,''); if(num.length==9) num='94'+num; if(num.length==10&&num.startsWith('0')) num='94'+num.substring(1); window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg));}}
+function openPay(id){curShopId=id; let s=shops.find(x=>x.id==id); document.getElementById('payTitle').innerText=s.name+' - Paid'; document.getElementById('payAmount').value=''; document.getElementById('payInfo').innerHTML=`Current Bal: <b>Rs.${s.balance}</b>`; document.getElementById('payModal').classList.remove('hidden');}
+function closePay(){document.getElementById('payModal').classList.add('hidden');}
+function confirmPay(){let amt=parseFloat(document.getElementById('payAmount').value); if(!amt) return alert('Amount'); let s=shops.find(x=>x.id==curShopId); s.balance-=amt; s.totalPaid+=amt; let rec={id:Date.now(),shopId:s.id,shopName:s.name,area:s.area,type:'payment',amount:amt,balance:s.balance,date:new Date().toISOString(),dateStr:new Date().toLocaleDateString()}; tx.unshift(rec); save(); closePay(); renderShops();}
+function openReport(id){let s=shops.find(x=>x.id==id); let list=tx.filter(t=>t.shopId==id); document.getElementById('repTitle').innerText=s.name+' Bal:Rs.'+s.balance; let html=`<div class="grid grid-cols-3 gap-2 mb-4"><div class="bg-green-50 p-3 rounded-xl text-center"><div class="text-[11px]">Sale</div><div class="font-bold">Rs.${s.totalSale}</div></div><div class="bg-blue-50 p-3 rounded-xl text-center"><div class="text-[11px]">Paid</div><div class="font-bold">Rs.${s.totalPaid}</div></div><div class="bg-yellow-50 p-3 rounded-xl text-center"><div class="text-[11px]">Bal</div><div class="font-bold">Rs.${s.balance}</div></div></div>`; html+=list.map(t=>{if(t.type=='sale') return `<div class="border-l-4 border-[#0a5c26] p-3 bg-gray-50 rounded-r-xl mb-2"><div class="flex justify-between"><b class="text-sm">SALE Rs.${t.total}</b><span class="text-[11px]">${t.dateStr}</span></div><div class="text-[11px]">${t.details}</div></div>`; else return `<div class="border-l-4 border-blue-500 p-3 bg-blue-50 rounded-r-xl mb-2"><div class="flex justify-between"><b class="text-sm text-blue-600">PAID Rs.${t.amount}</b><span class="text-[11px]">${t.dateStr}</span></div><div class="text-[11px]">Bal Rs.${t.balance}</div></div>`;}).join('')||'<div class="text-center py-10 text-gray-400">No data</div>'; document.getElementById('repContent').innerHTML=html; document.getElementById('reportModal').classList.remove('hidden');}
+function closeReport(){document.getElementById('reportModal').classList.add('hidden');}
+function waShop(id){let s=shops.find(x=>x.id==id); let num=s.phone.replace(/[^0-9]/g,''); if(!num) return alert('Phone இல்லை'); if(num.length==9) num='94'+num; window.open('https://wa.me/'+num+'?text='+encodeURIComponent(`${s.name} Bal Rs.${s.balance}`));}
+function openAdmin(){let pin=prompt('PIN 1234'); if(pin=='1234'){let data=JSON.stringify({shops,tx},null,2); let blob=new Blob([data],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='eravur.json'; a.click();}}
+function exportSheet(){openAdmin();}
+renderShops();
 </script>
 </body>
 </html>
