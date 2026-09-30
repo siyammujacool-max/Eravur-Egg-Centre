@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a5c26">
+<title>ERAVUR EGG CENTRE</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui}
+body{margin:0;background:#f1f8e9;padding-bottom:80px}
+.header{background:#0a5c26;color:white;padding:16px;text-align:center;position:sticky;top:0}
+.card{background:white;margin:12px;border-radius:16px;padding:16px;box-shadow:0 2px 12px #0001}
+.label{font-weight:bold;color:#0a5c26;font-size:13px;margin-bottom:6px;display:block}
+input,select{width:100%;padding:13px;border:1.5px solid #c8e6c9;border-radius:10px;font-size:15px}
+.row{display:flex;gap:8px;margin:8px 0}.row>*{flex:1}
+.btn{background:#0a5c26;color:white;padding:15px;border:none;border-radius:12px;font-weight:bold;width:100%;margin-top:10px}
+.qty-box{display:flex;border:1.5px solid #c8e6c9;border-radius:10px;overflow:hidden}
+.qty-box button{width:40px;height:42px;border:none;background:#f1f8e9;font-size:20px;font-weight:bold}
+.qty-box input{text-align:center;border:none}
+.total-box{background:#e8f5e9;border:2px dashed #0a5c26;border-radius:12px;padding:12px;text-align:center}
+.total-box b{font-size:20px;color:#0a5c26}
+.bill-item{border-left:4px solid #0a5c26;padding:10px;background:#fafafa;border-radius:8px;margin:6px 0}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>🥚 ERAVUR EGG CENTRE</h1>
+<small>0755032253 - ஏறாவூர்</small>
+</div>
+
+<div class="card">
+<span class="label">கடை பெயர் / Customer</span>
+<input id="shop" placeholder="Maryam Bakery">
+<div class="row">
+<div><span class="label">Phone</span><input id="phone" placeholder="9475..."></div>
+<div><span class="label">பழைய பாக்கி</span><input id="oldBal" type="number" value="0" oninput="calc()"></div>
+</div>
+</div>
+
+<div class="card">
+<span class="label">முட்டை - 240/260/280/300</span>
+<div id="eggRows"></div>
+<div class="total-box">
+<div>இன்றைய பில்: Rs. <span id="todayTot">0</span></div>
+<b id="grandTot">Rs. 0</b> - மொத்த பாக்கி
+<div style="font-size:12px" id="eggInfo"></div>
+</div>
+<button class="btn" onclick="saveBill()">💾 Save & WhatsApp அனுப்பு</button>
+<button class="btn" style="background:#555" onclick="window.print()">🖨️ Print</button>
+</div>
+
+<div class="card">
+<span class="label">History - Phone இல் Save ஆகும்</span>
+<div id="history"></div>
+</div>
+
+<script>
+const sizes=[240,260,280,300];
+let state={}; sizes.forEach(s=>state[s]={qty:0,price:s==240?24:s==260?26:s==280?28:30});
+function renderRows(){
+ let html=''; sizes.forEach(s=>{
+  html+=`<div class="row" style="align-items:center"><div style="font-weight:bold;width:80px">W ${s}</div><div class="qty-box"><button onclick="chg(${s},-1)">-</button><input id="q${s}" type="number" value="${state[s].qty}" oninput="state[${s}].qty=parseInt(this.value)||0;calc()"><button onclick="chg(${s},1)">+</button></div><input id="p${s}" type="number" value="${state[s].price}" style="max-width:80px" oninput="state[${s}].price=parseFloat(this.value)||0;calc()"></div>`;
+ }); document.getElementById('eggRows').innerHTML=html;
+}
+function chg(s,d){state[s].qty=Math.max(0,state[s].qty+d);document.getElementById('q'+s).value=state[s].qty;calc();}
+function calc(){
+ let today=0,eggs=0,det=[]; sizes.forEach(s=>{
+  let q=state[s].qty,p=state[s].price; let e=s*q; let amt=e*p; today+=amt; eggs+=e; if(q>0) det.push(`${s}x${q}=${e}`);
+ });
+ let old=parseFloat(document.getElementById('oldBal').value)||0;
+ document.getElementById('todayTot').innerText=today.toLocaleString();
+ document.getElementById('grandTot').innerText='Rs. '+(today+old).toLocaleString();
+ document.getElementById('eggInfo').innerText=det.join(' | ')+' | Eggs:'+eggs;
+ return {today,grand:today+old,eggs,details:det};
+}
+let bills=JSON.parse(localStorage.getItem('eravur_bills')||'[]');
+function saveBill(){
+ let shop=document.getElementById('shop').value||'Customer'; let ph=document.getElementById('phone').value; let d=calc();
+ if(d.today==0) return alert('Qty podunga');
+ let rec={shop,grand:d.grand,today:d.today,old:document.getElementById('oldBal').value,date:new Date().toLocaleString(),details:d.details.join(',')};
+ bills.unshift(rec); localStorage.setItem('eravur_bills',JSON.stringify(bills)); render();
+ let msg=`ERAVUR EGG CENTRE\n${shop} - Today Rs.${d.today} Old Rs.${rec.old} Total Rs.${d.grand} - ${d.details.join(',')}`;
+ if(ph){ let num=ph.replace(/[^0-9]/g,''); if(num.length==9) num='94'+num; window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg)); } else alert(msg);
+}
+function render(){ document.getElementById('history').innerHTML=bills.slice(0,10).map(b=>`<div class="bill-item"><b>${b.shop}</b> Rs.${b.grand}<br><small>${b.date} ${b.details}</small></div>`).join(''); }
+renderRows();calc();render();
+</script>
+</body>
+</html>
