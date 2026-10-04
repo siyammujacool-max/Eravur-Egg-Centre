@@ -3,96 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eravur Egg Centre - Cloud V3 FREE</title>
+<title>Eravur Egg Centre</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-body{background:#f5f5f5;padding:10px}
-.header{background:#2e7d32;color:white;padding:15px;border-radius:12px;display:flex;justify-content:space-between;align-items:center}
-.card{background:white;border-radius:12px;padding:15px;margin:10px 0;box-shadow:0 2px 8px #0001}
-.shop{display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #eee;cursor:pointer}
-.badge{padding:2px 8px;border-radius:10px;font-size:11px;color:white}
-.area-Eravur{background:#2e7d32}.area-Oddamavadi{background:#ef6c00}.area-Chenkalady{background:#1565c0}
-.btn{padding:10px 15px;border:none;border-radius:8px;cursor:pointer;font-weight:bold}
-.btn-green{background:#2e7d32;color:white}.btn-orange{background:#ff9800;color:white}.btn-blue{background:#1976d2;color:white}
-input,select{width:100%;padding:12px;margin:5px 0;border:1px solid #ddd;border-radius:8px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.pdf-bar{background:#fff3e0;padding:10px;border-radius:8px;margin:10px 0;display:flex;gap:10px;flex-wrap:wrap}
-.stat{display:inline-block;padding:5px 10px;background:#e8f5e9;border-radius:6px;font-size:13px;margin:2px}
+body{background:#f0f2f5;padding:8px}
+.top{background:#1b5e20;color:#fff;padding:12px 15px;border-radius:10px;display:flex;justify-content:space-between;align-items:center}
+.top h2{font-size:18px}
+.top small{opacity:.9}
+.row{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap}
+.btn{border:none;border-radius:8px;padding:10px 14px;font-weight:700;cursor:pointer}
+.btn-w{background:#fff;border:1px solid #ddd}
+.btn-o{background:#ff8f00;color:#fff}
+.btn-b{background:#1565c0;color:#fff}
+.btn-g{background:#2e7d32;color:#fff;width:100%}
+.card{background:#fff;border-radius:10px;padding:12px;margin:8px 0;box-shadow:0 1px 3px #0001}
+input,select{padding:10px;border:1px solid #ddd;border-radius:8px;width:100%}
+.shop{padding:10px 0;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center}
+.shop:last-child{border:none}
+.pending{color:#c62828;font-weight:800}
+.paid{color:#2e7d32;font-weight:800}
+.small{font-size:12px;color:#666}
 </style>
 </head>
 <body>
-<div class="header">
-<div><h2>🥚 Eravur Egg Centre V3</h2><small id="count">Loading...</small></div>
-<div><button class="btn" style="background:white;color:#2e7d32" onclick="exportData()">Export</button></div>
+<div class="top"><div><h2>🥚 Eravur Egg Centre</h2><small id="count">ALL(0)</small></div><button class="btn btn-w" onclick="exportData()">Export</button></div>
+
+<div class="row">
+<input type="date" id="reportDate" style="width:130px">
+<button class="btn btn-o" onclick="dailyPDF()">Daily PDF</button>
+<button class="btn btn-b" onclick="allCustomersPDF()">All PDF</button>
+<select id="areaFilter" onchange="render()" style="width:120px"><option value="">All Area</option><option>Eravur</option><option>Oddamavadi</option><option>Chenkalady</option></select>
 </div>
-<div class="pdf-bar">
-<input type="date" id="reportDate" style="width:auto">
-<button class="btn btn-orange" onclick="dailyPDF()">📄 Daily PDF</button>
-<button class="btn btn-blue" onclick="allCustomersPDF()">📚 All PDF</button>
-<select id="areaFilter" onchange="renderShops()" style="width:auto"><option value="">All Areas</option><option>Eravur</option><option>Oddamavadi</option><option>Chenkalady</option></select>
-</div>
+
 <div class="card">
-<h3>➕ Customer (Phone Edit)</h3>
-<div class="grid2">
-<input id="cName" placeholder="Name"><input id="cPhone" placeholder="Phone">
-</div>
-<div class="grid2">
-<select id="cArea"><option>Eravur</option><option>Oddamavadi</option><option>Chenkalady</option></select><input id="cOld" type="number" placeholder="OLD Balance">
-</div>
-<button class="btn btn-green" style="width:100%" onclick="saveCustomer()">Save Customer</button>
+<b>+ Customer</b>
+<div class="row"><input id="cName" placeholder="Name"><input id="cPhone" placeholder="Phone"></div>
+<div class="row"><select id="cArea"><option>Eravur</option><option>Oddamavadi</option><option>Chenkalady</option></select><input id="cOld" type="number" placeholder="OLD Balance"></div>
+<button class="btn btn-g" onclick="saveCustomer()">Save Customer</button>
 <input type="hidden" id="editId">
 </div>
+
 <div id="shopList" class="card"></div>
+
 <div id="detail" class="card" style="display:none">
-<h3 id="detailName"></h3><p id="detailPhone"></p><div id="stats"></div>
-<div class="grid2">
-<div><h4>🥚 Sale - Egg Qty</h4>
-<div class="grid2"><input id="q240" type="number" placeholder="W240 Qty"><input id="r240" type="number" value="33"></div>
-<div class="grid2"><input id="q260" type="number" placeholder="W260 Qty"><input id="r260" type="number" value="32"></div>
-<div class="grid2"><input id="q280" type="number" placeholder="W280 Qty"><input id="r280" type="number" value="28"></div>
-<div class="grid2"><input id="q300" type="number" placeholder="W300 Qty"><input id="r300" type="number" value="30"></div>
-<p>Total: Rs.<span id="saleTotal">0</span> | Eggs: <span id="saleEggs">0</span></p>
-<button class="btn btn-green" style="width:100%" onclick="addSale()">Add Sale</button>
+<h3 id="dName"></h3><small id="dPhone"></small>
+<div id="stats" class="row"></div>
+<div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div>
+<b>Sale - Qty</b>
+<div class="row"><input id="q240" type="number" placeholder="240"><input id="r240" type="number" value="33"></div>
+<div class="row"><input id="q260" type="number" placeholder="260"><input id="r260" type="number" value="32"></div>
+<div class="row"><input id="q280" type="number" placeholder="280"><input id="r280" type="number" value="28"></div>
+<div class="row"><input id="q300" type="number" placeholder="300"><input id="r300" type="number" value="30"></div>
+<div class="small">Total: Rs.<span id="saleTotal">0</span> | Eggs: <span id="saleEggs">0</span></div>
+<button class="btn btn-g" onclick="addSale()">Add Sale</button>
 </div>
-<div><h4>💰 Payment</h4><input id="payAmt" type="number" placeholder="Amount"><select id="payFor"><option value="sale">For SALE</option><option value="old">For OLD</option></select><button class="btn btn-blue" style="width:100%" onclick="addPayment()">Add Payment</button><button class="btn" style="width:100%;margin-top:10px;background:#eee" onclick="customerPDF()">📄 This Customer PDF</button></div>
+<div>
+<b>Payment</b>
+<input id="payAmt" type="number" placeholder="Amount">
+<select id="payFor"><option value="sale">For SALE</option><option value="old">For OLD</option></select>
+<button class="btn btn-b" style="width:100%;margin-top:6px" onclick="addPayment()">Add Payment</button>
+<button class="btn btn-w" style="width:100%;margin-top:6px" onclick="customerPDF()">This Customer PDF</button>
 </div>
-<h4>Transactions</h4><div id="txList"></div><button class="btn" onclick="closeDetail()" style="width:100%;background:#ddd;margin-top:10px">Close</button>
 </div>
+<div id="txList"></div>
+<button class="btn btn-w" style="width:100%;margin-top:8px" onclick="closeDetail()">Close</button>
+</div>
+
 <script>
-const initialData={"shops":[{"id":1791042335823,"name":"Opera BK","area":"Eravur","phone":"0776511096","oldBalance":14000,"oldPaid":7000,"totalSale":0,"salePaid":0},{"id":1791040137617,"name":"Haq Hajiyar","area":"Eravur","phone":"(077) 439 8031","oldBalance":0,"oldPaid":0,"totalSale":40800,"salePaid":40800},{"id":1790794696995,"name":"ரஹுமான் ஹாஜியார்","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":76800,"salePaid":0},{"id":1790794696996,"name":"ஜாமல்","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794696997,"name":"post office கடை","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794696998,"name":"ராபி டா நானா","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794696999,"name":"ஹார்ட். கடை","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697000,"name":"மீரவோடை கடை","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697001,"name":"மீரவோடை புது கடை","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697002,"name":"அபுபக்கர்","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697003,"name":"வாளச்சேனை மரக்கறி கடை","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697004,"name":"ஜீவா","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":46560,"salePaid":0},{"id":1790794697005,"name":"R. தம்பி","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":87520,"salePaid":0},{"id":1790794697006,"name":"நிரோஷன்","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697007,"name":"ஆனந்தன்","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697008,"name":"வெற்றில கடை","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697009,"name":"வசந்தன்","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697010,"name":"ரஜனி மகன்","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697011,"name":"கருவாட்டு கடை","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697012,"name":"பிரபாஸ் hotel","area":"Chenkalady","phone":"(076) 564 8123","oldBalance":20000,"oldPaid":0,"totalSale":58396,"salePaid":18576},{"id":1790794697013,"name":"மலர் food city","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697014,"name":"Bar. MA","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697015,"name":"மதுராம் hotel","area":"Chenkalady","phone":"(76) 116 0985","oldBalance":42720,"oldPaid":10000,"totalSale":0,"salePaid":0},{"id":1790794697016,"name":"ரிபாஸ்","area":"Eravur","phone":"(77) 454 0269","oldBalance":10000,"oldPaid":0,"totalSale":39600,"salePaid":39500},{"id":1790794697017,"name":"மன்சூர்","area":"Eravur","phone":"(077) 753 4552","oldBalance":362960,"oldPaid":6000,"totalSale":47220,"salePaid":12000},{"id":1790794697018,"name":"மன்சூர் 2","area":"Eravur","phone":"(75) 588 3455","oldBalance":18000,"oldPaid":12000,"totalSale":16120,"salePaid":10000},{"id":1790794697019,"name":"சபீர் மௌலவி","area":"Eravur","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697020,"name":"பதுரியா 1","area":"Eravur","phone":"0750146688","oldBalance":10000,"oldPaid":0,"totalSale":42880,"salePaid":12880},{"id":1790794697021,"name":"புகாரி மருமகன்","area":"Eravur","phone":"(075) 640 0197","oldBalance":0,"oldPaid":0,"totalSale":74160,"salePaid":35000},{"id":1790794697022,"name":"colombu store","area":"Eravur","phone":"(75) 447 5350","oldBalance":0,"oldPaid":0,"totalSale":23760,"salePaid":0},{"id":1790794697023,"name":"நதிர்","area":"Eravur","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697024,"name":"நஜீம்","area":"Eravur","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697025,"name":"மௌனுதீன்","area":"Eravur","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0}]};
-let shops=JSON.parse(localStorage.getItem('egg_shops_v3')||'null')||initialData.shops;
+const init={"shops":[{"id":1791042335823,"name":"Opera BK","area":"Eravur","phone":"0776511096","oldBalance":14000,"oldPaid":7000,"totalSale":0,"salePaid":0},{"id":1791040137617,"name":"Haq Hajiyar","area":"Eravur","phone":"(077) 439 8031","oldBalance":0,"oldPaid":0,"totalSale":40800,"salePaid":40800},{"id":1790794696995,"name":"ரஹுமான் ஹாஜியார்","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":76800,"salePaid":0},{"id":1790794696999,"name":"ஹார்ட். கடை","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697004,"name":"ஜீவா","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":46560,"salePaid":0},{"id":1790794697005,"name":"R. தம்பி","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":87520,"salePaid":0},{"id":1790794697012,"name":"பிரபாஸ் hotel","area":"Chenkalady","phone":"(076) 564 8123","oldBalance":20000,"oldPaid":0,"totalSale":58396,"salePaid":18576},{"id":1790794697015,"name":"மதுராம் hotel","area":"Chenkalady","phone":"(76) 116 0985","oldBalance":42720,"oldPaid":10000,"totalSale":0,"salePaid":0},{"id":1790794697016,"name":"ரிபாஸ்","area":"Eravur","phone":"(77) 454 0269","oldBalance":10000,"oldPaid":0,"totalSale":39600,"salePaid":39500},{"id":1790794697017,"name":"மன்சூர்","area":"Eravur","phone":"(077) 753 4552","oldBalance":362960,"oldPaid":6000,"totalSale":47220,"salePaid":12000},{"id":1790794697018,"name":"மன்சூர் 2","area":"Eravur","phone":"(75) 588 3455","oldBalance":18000,"oldPaid":12000,"totalSale":16120,"salePaid":10000},{"id":1790794697020,"name":"பதுரியா 1","area":"Eravur","phone":"0750146688","oldBalance":10000,"oldPaid":0,"totalSale":42880,"salePaid":12880},{"id":1790794697021,"name":"புகாரி மருமகன்","area":"Eravur","phone":"(075) 640 0197","oldBalance":0,"oldPaid":0,"totalSale":74160,"salePaid":35000},{"id":1790794697022,"name":"colombu store","area":"Eravur","phone":"(75) 447 5350","oldBalance":0,"oldPaid":0,"totalSale":23760,"salePaid":0}]};
+let shops=JSON.parse(localStorage.getItem('egg_shops_v3')||'null')||init.shops; 
+if(shops.length<20){let all=JSON.parse(localStorage.getItem('egg_shops_backup')||'[]'); if(all.length>shops.length) shops=all;}
+// Load full 33 from original if needed
+let fullData=[{"id":1791042335823,"name":"Opera BK","area":"Eravur","phone":"0776511096","oldBalance":14000,"oldPaid":7000,"totalSale":0,"salePaid":0},{"id":1791040137617,"name":"Haq Hajiyar","area":"Eravur","phone":"(077) 439 8031","oldBalance":0,"oldPaid":0,"totalSale":40800,"salePaid":40800},{"id":1790794696995,"name":"ரஹுமான் ஹாஜியார்","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":76800,"salePaid":0},{"id":1790794696996,"name":"ஜாமல்","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794696997,"name":"post office கடை","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794696998,"name":"ராபி டா நானா","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794696999,"name":"ஹார்ட். கடை","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697000,"name":"மீரவோடை கடை","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697001,"name":"மீரவோடை புது கடை","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697002,"name":"அபுபக்கர்","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697003,"name":"வாளச்சேனை மரக்கறி கடை","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697004,"name":"ஜீவா","area":"Oddamavadi","phone":"","oldBalance":0,"oldPaid":0,"totalSale":46560,"salePaid":0},{"id":1790794697005,"name":"R. தம்பி","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":87520,"salePaid":0},{"id":1790794697006,"name":"நிரோஷன்","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697007,"name":"ஆனந்தன்","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697008,"name":"வெற்றில கடை","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697009,"name":"வசந்தன்","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697010,"name":"ரஜனி மகன்","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697011,"name":"கருவாட்டு கடை","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697012,"name":"பிரபாஸ் hotel","area":"Chenkalady","phone":"(076) 564 8123","oldBalance":20000,"oldPaid":0,"totalSale":58396,"salePaid":18576},{"id":1790794697013,"name":"மலர் food city","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697014,"name":"Bar. MA","area":"Chenkalady","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697015,"name":"மதுராம் hotel","area":"Chenkalady","phone":"(76) 116 0985","oldBalance":42720,"oldPaid":10000,"totalSale":0,"salePaid":0},{"id":1790794697016,"name":"ரிபாஸ்","area":"Eravur","phone":"(77) 454 0269","oldBalance":10000,"oldPaid":0,"totalSale":39600,"salePaid":39500},{"id":1790794697017,"name":"மன்சூர்","area":"Eravur","phone":"(077) 753 4552","oldBalance":362960,"oldPaid":6000,"totalSale":47220,"salePaid":12000},{"id":1790794697018,"name":"மன்சூர் 2","area":"Eravur","phone":"(75) 588 3455","oldBalance":18000,"oldPaid":12000,"totalSale":16120,"salePaid":10000},{"id":1790794697019,"name":"சபீர் மௌலவி","area":"Eravur","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697020,"name":"பதுரியா 1","area":"Eravur","phone":"0750146688","oldBalance":10000,"oldPaid":0,"totalSale":42880,"salePaid":12880},{"id":1790794697021,"name":"புகாரி மருமகன்","area":"Eravur","phone":"(075) 640 0197","oldBalance":0,"oldPaid":0,"totalSale":74160,"salePaid":35000},{"id":1790794697022,"name":"colombu store","area":"Eravur","phone":"(75) 447 5350","oldBalance":0,"oldPaid":0,"totalSale":23760,"salePaid":0},{"id":1790794697023,"name":"நதிர்","area":"Eravur","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697024,"name":"நஜீம்","area":"Eravur","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0},{"id":1790794697025,"name":"மௌனுதீன்","area":"Eravur","phone":"","oldBalance":0,"oldPaid":0,"totalSale":0,"salePaid":0}];
+if(shops.length<33) shops=fullData;
 let tx=JSON.parse(localStorage.getItem('egg_tx_v3')||'[]');
-let currentId=null;
-function saveLS(){localStorage.setItem('egg_shops_v3',JSON.stringify(shops));localStorage.setItem('egg_tx_v3',JSON.stringify(tx));}
-function renderShops(){
-  const filter=document.getElementById('areaFilter').value;
-  let list=shops; if(filter) list=shops.filter(s=>s.area===filter);
-  let totalPending=shops.reduce((a,s)=>a+(s.oldBalance-s.oldPaid+s.totalSale-s.salePaid),0);
-  document.getElementById('count').innerText=`ALL(${shops.length}) | Pending Rs.${totalPending.toLocaleString()}`;
-  let html=''; list.forEach(s=>{let bal=(s.oldBalance-s.oldPaid)+(s.totalSale-s.salePaid); html+=`<div class="shop" onclick="openShop(${s.id})"><div><b>${s.name}</b> <span class="badge area-${s.area}">${s.area}</span><br><small>${s.phone||'No phone'} | Bal:${bal}</small></div><div><b style="color:${bal>0?'red':'green'}">Rs.${bal}</b><br><button onclick="event.stopPropagation();editShop(${s.id})">✏️</button></div></div>`;});
-  document.getElementById('shopList').innerHTML=html;
+let cur=null;
+function save(){localStorage.setItem('egg_shops_v3',JSON.stringify(shops));localStorage.setItem('egg_tx_v3',JSON.stringify(tx));}
+function render(){
+let f=document.getElementById('areaFilter').value;
+let list=f?shops.filter(s=>s.area===f):shops;
+let pend=shops.reduce((a,s)=>a+(s.oldBalance-s.oldPaid+s.totalSale-s.salePaid),0);
+document.getElementById('count').innerText=`ALL(${shops.length}) | Pending Rs.${pend.toLocaleString()}`;
+let h='';list.forEach(s=>{let b=(s.oldBalance-s.oldPaid)+(s.totalSale-s.salePaid);h+=`<div class="shop" onclick="openShop(${s.id})"><div><b>${s.name}</b> <span class="small">${s.area}</span><br><span class="small">${s.phone||'No phone'} | Bal:${b}</span></div><div><span class="${b>0?'pending':'paid'}">Rs.${b}</span><br><button onclick="event.stopPropagation();editShop(${s.id})" class="btn btn-w" style="padding:4px 8px">✏️</button></div></div>`});
+document.getElementById('shopList').innerHTML=h;
 }
-function saveCustomer(){
-  let name=document.getElementById('cName').value.trim(); let phone=document.getElementById('cPhone').value.trim(); let area=document.getElementById('cArea').value; let oldB=parseInt(document.getElementById('cOld').value)||0; let editId=document.getElementById('editId').value;
-  if(!name) return alert('Name podunga'); if(editId){let s=shops.find(x=>x.id==editId); s.name=name; s.phone=phone; s.area=area; if(oldB) s.oldBalance=oldB;} else {shops.push({id:Date.now(),name,phone,area,oldBalance:oldB,oldPaid:0,totalSale:0,salePaid:0});}
-  document.getElementById('cName').value='';document.getElementById('cPhone').value='';document.getElementById('cOld').value='';document.getElementById('editId').value=''; saveLS(); renderShops();
-}
-function editShop(id){let s=shops.find(x=>x.id==id); document.getElementById('cName').value=s.name; document.getElementById('cPhone').value=s.phone; document.getElementById('cArea').value=s.area; document.getElementById('cOld').value=s.oldBalance; document.getElementById('editId').value=id; window.scrollTo(0,0);}
-function openShop(id){currentId=id; let s=shops.find(x=>x.id==id); document.getElementById('detail').style.display='block'; document.getElementById('detailName').innerText=s.name; document.getElementById('detailPhone').innerHTML=`📱 ${s.phone||'No phone'} | ${s.area} | <a href="tel:${s.phone}">Call</a>`; updateStats(); renderTx();}
-function updateStats(){let s=shops.find(x=>x.id==currentId); let oldBal=s.oldBalance-s.oldPaid; let saleBal=s.totalSale-s.salePaid; document.getElementById('stats').innerHTML=`<span class="stat">OLD: ${oldBal}</span> <span class="stat">SALE: ${saleBal}</span> <span class="stat" style="background:#ffcdd2">TOTAL: ${oldBal+saleBal}</span>`;}
-function calcSale(){let q240=parseInt(document.getElementById('q240').value)||0,r240=parseInt(document.getElementById('r240').value)||33;let q260=parseInt(document.getElementById('q260').value)||0,r260=parseInt(document.getElementById('r260').value)||32;let q280=parseInt(document.getElementById('q280').value)||0,r280=parseInt(document.getElementById('r280').value)||28;let q300=parseInt(document.getElementById('q300').value)||0,r300=parseInt(document.getElementById('r300').value)||30;let total=q240*r240+q260*r260+q280*r280+q300*r300;let eggs=(q240*30)+(q260*30)+(q280*30)+(q300*30);document.getElementById('saleTotal').innerText=total;document.getElementById('saleEggs').innerText=eggs;return{total,eggs,q240,r240,q260,r260,q280,r280,q300,r300};}
-document.querySelectorAll('#q240,#r240,#q260,#r260,#q280,#r280,#q300,#r300').forEach(e=>e.addEventListener('input',calcSale));
-function addSale(){let d=calcSale();if(d.total==0) return alert('Qty podunga');let s=shops.find(x=>x.id==currentId);s.totalSale+=d.total;let details=[];if(d.q240) details.push(`W240x${d.q240}`);if(d.q260) details.push(`W260x${d.q260}`);if(d.q280) details.push(`W280x${d.q280}`);if(d.q300) details.push(`W300x${d.q300}`);tx.unshift({id:Date.now(),shopId:s.id,shopName:s.name,area:s.area,type:'sale',total:d.total,eggs:d.eggs,details:details.join(','),dateStr:new Date().toLocaleDateString('en-GB'),dateISO:new Date().toISOString(),qtys:d});saveLS();updateStats();renderTx();renderShops();document.getElementById('q240').value='';document.getElementById('q260').value='';document.getElementById('q280').value='';document.getElementById('q300').value='';calcSale();}
-function addPayment(){let amt=parseInt(document.getElementById('payAmt').value)||0;let forType=document.getElementById('payFor').value;if(!amt) return alert('Amount podunga');let s=shops.find(x=>x.id==currentId);if(forType==='old') s.oldPaid+=amt; else s.salePaid+=amt;tx.unshift({id:Date.now(),shopId:s.id,shopName:s.name,area:s.area,type:'payment',amount:amt,for:forType,dateStr:new Date().toLocaleDateString('en-GB'),dateISO:new Date().toISOString()});saveLS();updateStats();renderTx();renderShops();document.getElementById('payAmt').value='';}
-function renderTx(){let list=tx.filter(t=>t.shopId==currentId);let html='';list.slice(0,20).forEach(t=>{if(t.type==='sale') html+=`<div style="padding:8px;border-bottom:1px solid #eee">🥚 SALE: Rs.${t.total} | ${t.eggs} eggs | ${t.details} | ${t.dateStr}</div>`;else html+=`<div style="padding:8px;border-bottom:1px solid #eee">💰 PAY: Rs.${t.amount} for ${t.for} | ${t.dateStr}</div>`;});document.getElementById('txList').innerHTML=html||'No transactions';}
-function closeDetail(){document.getElementById('detail').style.display='none';currentId=null;}
-function exportData(){let data={shops,tx,updated:new Date().toISOString()};let blob=new Blob([JSON.stringify(data)],{type:'application/json'});let url=URL.createObjectURL(blob);let a=document.createElement('a');a.href=url;a.download='eravur_backup_'+Date.now()+'.json';a.click();}
-function dailyPDF(){let date=document.getElementById('reportDate').value;if(!date) date=new Date().toISOString().split('T')[0];let dateStr=new Date(date).toLocaleDateString('en-GB');let dayTx=tx.filter(t=>t.dateStr===dateStr||t.dateISO?.startsWith(date));const{jsPDF}=window.jspdf;let doc=new jsPDF();doc.text(`Eravur Egg Centre - Daily ${dateStr}`,10,10);let rows=[];shops.forEach(s=>{let bal=(s.oldBalance-s.oldPaid)+(s.totalSale-s.salePaid);let todaySale=dayTx.filter(t=>t.shopId===s.id&&t.type==='sale').reduce((a,b)=>a+b.total,0);let todayPaid=dayTx.filter(t=>t.shopId===s.id&&t.type==='payment').reduce((a,b)=>a+b.amount,0);let todayEggs=dayTx.filter(t=>t.shopId===s.id&&t.type==='sale').reduce((a,b)=>a+(b.eggs||0),0);if(todaySale>0||todayPaid>0||date===new Date().toISOString().split('T')[0]){rows.push([s.name,s.area,s.phone||'',todayEggs,todaySale,todayPaid,bal]);}});doc.autoTable({head:[['Customer','Area','Phone','Egg Qty','Sale Rs','Paid Rs','Balance']],body:rows,startY:20});let totalEggs=rows.reduce((a,r)=>a+r[3],0);let totalSale=rows.reduce((a,r)=>a+r[4],0);let totalPaid=rows.reduce((a,r)=>a+r[5],0);doc.text(`Total Eggs: ${totalEggs} | Sale: Rs.${totalSale} | Paid: Rs.${totalPaid}`,10,doc.lastAutoTable.finalY+10);doc.save(`Daily_${dateStr.replace(/\//g,'-')}.pdf`);}
-function customerPDF(){let s=shops.find(x=>x.id==currentId);let list=tx.filter(t=>t.shopId==currentId);const{jsPDF}=window.jspdf;let doc=new jsPDF();doc.text(`Customer: ${s.name}`,10,10);doc.text(`Phone: ${s.phone} | Area: ${s.area}`,10,18);doc.text(`OLD: ${s.oldBalance}-${s.oldPaid}=${s.oldBalance-s.oldPaid} | SALE: ${s.totalSale}-${s.salePaid}=${s.totalSale-s.salePaid}`,10,26);let rows=list.map(t=>{if(t.type==='sale') return[t.dateStr,'SALE',t.details||'',t.eggs||'',t.total,''];else return[t.dateStr,'PAY',t.for,'','',t.amount];});doc.autoTable({head:[['Date','Type','Details','Eggs','Sale','Paid']],body:rows,startY:40});doc.save(`${s.name}_report.pdf`);}
-function allCustomersPDF(){const{jsPDF}=window.jspdf;let doc=new jsPDF();doc.text(`All Customers ${new Date().toLocaleDateString('en-GB')}`,10,10);let rows=shops.map(s=>{let oldBal=s.oldBalance-s.oldPaid;let saleBal=s.totalSale-s.salePaid;return[s.name,s.area,s.phone||'',oldBal,saleBal,oldBal+saleBal];});doc.autoTable({head:[['Name','Area','Phone','OLD Bal','SALE Bal','Total Bal']],body:rows,startY:20});doc.save('All_Customers.pdf');}
-document.getElementById('reportDate').valueAsDate=new Date();renderShops();
+function saveCustomer(){let n=document.getElementById('cName').value.trim(),p=document.getElementById('cPhone').value.trim(),a=document.getElementById('cArea').value,o=parseInt(document.getElementById('cOld').value)||0,e=document.getElementById('editId').value;if(!n)return alert('Name podunga');if(e){let s=shops.find(x=>x.id==e);s.name=n;s.phone=p;s.area=a;if(o)s.oldBalance=o;}else shops.push({id:Date.now(),name:n,phone:p,area:a,oldBalance:o,oldPaid:0,totalSale:0,salePaid:0});document.getElementById('cName').value='';document.getElementById('cPhone').value='';document.getElementById('cOld').value='';document.getElementById('editId').value='';save();render();}
+function editShop(id){let s=shops.find(x=>x.id==id);document.getElementById('cName').value=s.name;document.getElementById('cPhone').value=s.phone;document.getElementById('cArea').value=s.area;document.getElementById('cOld').value=s.oldBalance;document.getElementById('editId').value=id;window.scrollTo(0,0);}
+function openShop(id){cur=id;let s=shops.find(x=>x.id==id);document.getElementById('detail').style.display='block';document.getElementById('dName').innerText=s.name;document.getElementById('dPhone').innerHTML=`${s.phone||''} | ${s.area} | <a href="tel:${s.phone}">Call</a>`;upd();renderTx();}
+function upd(){let s=shops.find(x=>x.id==cur);let ob=s.oldBalance-s.oldPaid,sb=s.totalSale-s.salePaid;document.getElementById('stats').innerHTML=`<span class="small">OLD:${ob}</span> <span class="small">SALE:${sb}</span> <b class="pending">TOTAL:${ob+sb}</b>`;}
+function calc(){let q240=parseInt(document.getElementById('q240').value)||0,r240=parseInt(document.getElementById('r240').value)||33,q260=parseInt(document.getElementById('q260').value)||0,r260=parseInt(document.getElementById('r260').value)||32,q280=parseInt(document.getElementById('q280').value)||0,r280=parseInt(document.getElementById('r280').value)||28,q300=parseInt(document.getElementById('q300').value)||0,r300=parseInt(document.getElementById('r300').value)||30;let t=q240*r240+q260*r260+q280*r280+q300*r300,e=(q240+q260+q280+q300)*30;document.getElementById('saleTotal').innerText=t;document.getElementById('saleEggs').innerText=e;return{t,e,q240,r240,q260,r260,q280,r280,q300,r300};}
+document.querySelectorAll('#q240,#r240,#q260,#r260,#q280,#r280,#q300,#r300').forEach(x=>x.addEventListener('input',calc));
+function addSale(){let d=calc();if(d.t==0)return alert('Qty podunga');let s=shops.find(x=>x.id==cur);s.totalSale+=d.t;let det=[];if(d.q240)det.push(`240x${d.q240}`);if(d.q260)det.push(`260x${d.q260}`);if(d.q280)det.push(`280x${d.q280}`);if(d.q300)det.push(`300x${d.q300}`);tx.unshift({id:Date.now(),shopId:s.id,shopName:s.name,area:s.area,type:'sale',total:d.t,eggs:d.e,details:det.join(','),dateStr:new Date().toLocaleDateString('en-GB'),dateISO:new Date().toISOString(),qtys:d});save();upd();renderTx();render();['q240','q260','q280','q300'].forEach(id=>document.getElementById(id).value='');calc();}
+function addPayment(){let amt=parseInt(document.getElementById('payAmt').value)||0,forT=document.getElementById('payFor').value;if(!amt)return alert('Amount');let s=shops.find(x=>x.id==cur);if(forT==='old')s.oldPaid+=amt;else s.salePaid+=amt;tx.unshift({id:Date.now(),shopId:s.id,shopName:s.name,area:s.area,type:'payment',amount:amt,for:forT,dateStr:new Date().toLocaleDateString('en-GB'),dateISO:new Date().toISOString()});save();upd();renderTx();render();document.getElementById('payAmt').value='';}
+function renderTx(){let list=tx.filter(t=>t.shopId==cur);let h='';list.slice(0,20).forEach(t=>{if(t.type==='sale')h+=`<div class="small" style="padding:6px 0;border-bottom:1px solid #eee">🥚 Rs.${t.total} | ${t.eggs}eggs | ${t.details} | ${t.dateStr}</div>`;else h+=`<div class="small" style="padding:6px 0;border-bottom:1px solid #eee">💰 Rs.${t.amount} for ${t.for} | ${t.dateStr}</div>`});document.getElementById('txList').innerHTML=h||'<span class="small">No tx</span>';}
+function closeDetail(){document.getElementById('detail').style.display='none';cur=null;}
+function exportData(){let blob=new Blob([JSON.stringify({shops,tx})],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='backup_'+Date.now()+'.json';a.click();}
+function dailyPDF(){let date=document.getElementById('reportDate').value;if(!date)date=new Date().toISOString().split('T')[0];let dStr=new Date(date).toLocaleDateString('en-GB');let dayTx=tx.filter(t=>t.dateStr===dStr||t.dateISO?.startsWith(date));const{jsPDF}=window.jspdf;let doc=new jsPDF();doc.text(`Daily ${dStr}`,10,10);let rows=[];shops.forEach(s=>{let bal=(s.oldBalance-s.oldPaid)+(s.totalSale-s.salePaid);let ts=dayTx.filter(t=>t.shopId===s.id&&t.type==='sale').reduce((a,b)=>a+b.total,0),tp=dayTx.filter(t=>t.shopId===s.id&&t.type==='payment').reduce((a,b)=>a+b.amount,0),te=dayTx.filter(t=>t.shopId===s.id&&t.type==='sale').reduce((a,b)=>a+(b.eggs||0),0);if(ts>0||tp>0)rows.push([s.name,s.area,s.phone||'',te,ts,tp,bal]);});doc.autoTable({head:[['Name','Area','Phone','Eggs','Sale','Paid','Bal']],body:rows,startY:15});doc.save(`Daily_${dStr.replace(/\//g,'-')}.pdf`);}
+function customerPDF(){let s=shops.find(x=>x.id==cur),list=tx.filter(t=>t.shopId==cur);const{jsPDF}=window.jspdf;let doc=new jsPDF();doc.text(`${s.name} | ${s.phone} | ${s.area}`,10,10);let rows=list.map(t=>t.type==='sale'?[t.dateStr,'SALE',t.details,t.eggs,t.total,'']:[t.dateStr,'PAY',t.for,'','',t.amount]);doc.autoTable({head:[['Date','Type','Details','Eggs','Sale','Paid']],body:rows,startY:15});doc.save(`${s.name}.pdf`);}
+function allCustomersPDF(){const{jsPDF}=window.jspdf;let doc=new jsPDF();doc.text(`All Customers ${new Date().toLocaleDateString('en-GB')}`,10,10);let rows=shops.map(s=>{let ob=s.oldBalance-s.oldPaid,sb=s.totalSale-s.salePaid;return[s.name,s.area,s.phone||'',ob,sb,ob+sb];});doc.autoTable({head:[['Name','Area','Phone','OLD','SALE','Total']],body:rows,startY:15});doc.save('All.pdf');}
+document.getElementById('reportDate').valueAsDate=new Date();render();
 </script>
 </body>
 </html>
