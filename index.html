@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ERAVUR EGG V19.5.0</title>
+<title>ERAVUR EGG V19.5.1</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -15,7 +15,7 @@
   <div class="bg-white w-full max-w-sm rounded-[28px] p-8 text-center border-4 border-[#0a5c26]">
     <div class="w-24 h-24 mx-auto rounded-full border-4 border-[#0a5c26] bg-yellow-100 flex items-center justify-center text-5xl">🥚</div>
     <h1 class="text-xl font-black text-[#0a5c26] mt-3">ERAVUR EGG CENTRE</h1>
-    <p class="text-[10px] bg-[#0a5c26] text-white px-3 py-1 rounded-full inline-block mt-1">V19.5.0 - SHARE FIX</p>
+    <p class="text-[10px] bg-[#0a5c26] text-white px-3 py-1 rounded-full inline-block mt-1">V19.5.1 - KADAI RECOVER FIX</p>
     <input id="loginUser" class="w-full border-2 border-black rounded-xl p-3 mt-5 font-bold" value="eravur">
     <input id="loginPin" type="password" class="w-full border-2 border-black rounded-xl p-3 mt-2 font-bold" value="1234">
     <button onclick="doLogin()" class="w-full bg-[#0a5c26] text-white py-3.5 rounded-xl mt-4 font-black border-2 border-black">Login</button>
@@ -33,6 +33,7 @@
       <div class="flex gap-1">
         <button onclick="openPriceSettings()" class="bg-yellow-400 text-black px-2 py-1.5 rounded-full text-[9px] font-black border-2 border-black">⚙️<br>விலை</button>
         <button onclick="seedBackupToCloud()" class="bg-white text-black px-2 py-1.5 rounded-full text-[9px] font-black border-2 border-black">📤<br>Cloud</button>
+        <button onclick="openRecover()" class="bg-red-500 text-white px-2 py-1.5 rounded-full text-[9px] font-black border-2 border-black">♻️<br>RECOVER</button>
         <button onclick="doLogout()" class="bg-white/20 px-2 py-1.5 rounded-full text-[8px] border">Logout</button>
       </div>
     </div>
@@ -50,6 +51,12 @@
   </div>
 
   <div id="shopList" class="px-3 space-y-3"></div>
+  <div id="emptyBox" class="hidden mx-3 bg-red-100 border-[3px] border-red-600 rounded-xl p-4 text-center">
+    <div class="font-black text-red-700">⚠️ KADAI ILLA DA!</div>
+    <p class="text-[11px] font-bold mt-1">Puthu file na localStorage empty aagidum da! Bayapadatha, Cloud la irukku!</p>
+    <button onclick="loadFromCloud()" class="mt-2 bg-[#0a5c26] text-white px-4 py-2 rounded-full text-[11px] font-black border-2 border-black">☁️ CLOUD LA IRUNTHU EDU DA</button>
+    <button onclick="openRecover()" class="mt-2 bg-red-600 text-white px-4 py-2 rounded-full text-[11px] font-black border-2 border-black">♻️ RECOVER</button>
+  </div>
 
   <div class="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-black p-2.5 flex justify-between items-center">
     <div class="flex items-center gap-2">
@@ -63,7 +70,7 @@
   </div>
 </div>
 
-<!-- SHOP DETAIL MODAL -->
+<!-- SHOP MODAL -->
 <div id="shopModal" class="hidden fixed inset-0 bg-black/60 z-[90] flex items-end justify-center">
   <div class="bg-white w-full max-w-md rounded-t-[24px] p-4 max-h-[90vh] overflow-y-auto">
     <div class="flex justify-between"><h2 id="mShopName" class="font-black text-lg"></h2><button onclick="closeModal('shopModal')" class="font-black">X</button></div>
@@ -89,10 +96,10 @@
   </div>
 </div>
 
-<!-- SHARE MODAL - V19.5.0 FIXED -->
+<!-- SHARE MODAL V19.5.1 - OLD KANAKKU VARATHU -->
 <div id="shareModal" class="hidden fixed inset-0 bg-black/60 z-[95] flex items-center justify-center p-4">
   <div class="bg-white w-full max-w-sm rounded-[24px] p-4">
-    <div class="flex justify-between items-center"><h3 class="font-black">📤 Share V19.5.0</h3><button onclick="closeModal('shareModal')" class="w-8 h-8 border-2 border-black rounded-full font-black">X</button></div>
+    <div class="flex justify-between items-center"><h3 class="font-black">📤 Share V19.5.1</h3><button onclick="closeModal('shareModal')" class="w-8 h-8 border-2 border-black rounded-full font-black">X</button></div>
     <div class="bg-green-50 border-2 border-[#0a5c26] rounded-xl p-3 mt-3 text-center">
       <div id="shareTitle" class="font-bold text-[13px]"></div>
       <div id="shareBalance" class="font-black text-red-600 text-xl mt-1"></div>
@@ -119,36 +126,59 @@
   </div>
 </div>
 
-<script>
-// ===== CONFIG - UN FIREBASE CONFIG INGA PODU DA =====
-const firebaseConfig = { apiKey: "YOUR_API_KEY", authDomain: "YOUR_PROJECT.firebaseapp.com", projectId: "YOUR_PROJECT_ID" };
-try{ firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); }catch(e){ var db=null; }
+<!-- RECOVER MODAL -->
+<div id="recoverModal" class="hidden fixed inset-0 bg-black/60 z-[96] flex items-center justify-center p-4">
+  <div class="bg-white w-full max-w-sm rounded-[24px] p-5">
+    <h3 class="font-black">♻️ RECOVER KADAI</h3>
+    <p class="text-[11px] font-bold mt-2">1. Pazhaya file open pannu -> REPORTS / Excel la irunthu copy pannu<br>2. Illa Cloud button amukku, aprom inga Cloud button amukku<br>3. Illa keela paste pannu:</p>
+    <textarea id="recoverInput" class="w-full border-2 border-black rounded-xl p-3 mt-2 font-bold text-[11px] h-32" placeholder='Pazhaya file la: F12 -> Console -> copy(localStorage.getItem("eravur_shops")) - antha text-a inga paste pannu da!'></textarea>
+    <button onclick="doRecover()" class="w-full bg-red-600 text-white py-3 rounded-xl mt-3 font-black border-2 border-black">♻️ RECOVER PANNu DA!</button>
+    <button onclick="closeModal('recoverModal')" class="w-full py-2 mt-2 font-bold">Cancel</button>
+  </div>
+</div>
 
-let shops = JSON.parse(localStorage.getItem('eravur_shops')||'[]');
+<script>
+// ===== FIREBASE CONFIG - PAZHAYA FILE LA IRUNTHU COPY PANNU DA! =====
+// Pazhaya V19.4.9 file la irukka firebaseConfig-a inga paste pannu da!
+// Ippo YOUR_API_KEY nu irukku, athunala Cloud work aagathu!
+const firebaseConfig = { apiKey: "YOUR_API_KEY", authDomain: "YOUR_PROJECT.firebaseapp.com", projectId: "YOUR_PROJECT_ID" };
+try{ firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); }catch(e){ var db=null; console.log("Firebase config illa da"); }
+
+// ===== LOAD - ELLA KEY-YUM CHECK PANNUVOM DA! =====
+function loadShopsFromStorage(){
+  let keys = ['eravur_shops','shops','eravur_egg','eravurEgg','egg_shops'];
+  for(let k of keys){
+    try{
+      let v = localStorage.getItem(k);
+      if(v && JSON.parse(v).length>0){ console.log("Found in "+k); return JSON.parse(v); }
+    }catch(e){}
+  }
+  return [];
+}
+let shops = loadShopsFromStorage();
 let currentArea='ALL', currentShopId=null, shareTextGlobal='';
 let price = parseInt(localStorage.getItem('eravur_price')||'36');
 
 function doLogin(){ if(document.getElementById('loginUser').value=='eravur' && document.getElementById('loginPin').value=='1234'){ document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('appContent').classList.remove('hidden'); loadFromCloud(); } else alert('Wrong Login da!'); }
 function doLogout(){ location.reload(); }
-function saveLocal(){ localStorage.setItem('eravur_shops', JSON.stringify(shops)); }
+function saveLocal(){ localStorage.setItem('eravur_shops', JSON.stringify(shops)); localStorage.setItem('shops', JSON.stringify(shops)); }
 function setArea(a){ currentArea=a; renderShops(); }
 function fmt(n){ return 'Rs.'+Number(n||0).toLocaleString('en-LK'); }
 
-// ===== RENDER =====
 function renderShops(){
   let q = (document.getElementById('search').value||'').toLowerCase();
-  let list = shops.filter(s=> (currentArea=='ALL'||s.area==currentArea) && s.name.toLowerCase().includes(q));
+  let list = shops.filter(s=> (currentArea=='ALL'||s.area==currentArea) && (s.name||'').toLowerCase().includes(q));
   let total = list.reduce((a,s)=>a+Number(s.balance||0),0);
   document.getElementById('totBalance').innerText = fmt(total);
   document.getElementById('totCount').innerText = list.length+' kadai';
+  document.getElementById('emptyBox').classList.toggle('hidden', list.length>0);
   document.getElementById('shopList').innerHTML = list.map(s=>`
     <div class="bg-white border-2 border-black rounded-2xl p-3 flex justify-between items-center" onclick="openShop('${s.id}')">
       <div><div class="font-black text-[13px]">${s.name}</div><div class="text-[10px] text-gray-500">${s.area} • ${s.phone||''}</div><div class="text-[10px]">Last: ${s.lastSaleDate||'-'}</div></div>
       <div class="text-right"><div class="font-black text-red-600">${fmt(s.balance)}</div><button onclick="event.stopPropagation();shareShop('${s.id}')" class="bg-blue-100 px-3 py-1 rounded-full text-[10px] font-black border">📤 Share</button></div>
-    </div>`).join('') || '<div class="text-center p-5 font-bold">Kadai illa da!</div>';
+    </div>`).join('') || '';
 }
 
-// ===== SHOP DETAIL =====
 function openShop(id){
   currentShopId=id; let s=shops.find(x=>x.id==id);
   document.getElementById('mShopName').innerText=s.name+' - '+s.area;
@@ -184,10 +214,9 @@ function saveShop(){
   saveLocal(); renderShops(); closeModal('addShopModal');
 }
 
-// ===== ⭐ V19.5.0 SHARE FIX - OLD KANAKKU VARATHU! CURRENT BALANCE MATTUM! =====
+// ===== ⭐ SHARE FIX - OLD KANAKKU VARATHU! =====
 function shareShop(id){
   let s=shops.find(x=>x.id==id); if(!s) return;
-  // OLD HISTORY-A SERKKA KUDATHU DA! HISTORY LOOP-A FULL-A DELETE PANNITTOM!
   let txt = `*${s.name} - ${s.area}*\n`;
   txt += `📞 ${s.phone||''}\n\n`;
   txt += `*Current Balance:* ${fmt(s.balance)}\n`;
@@ -203,7 +232,6 @@ function shareShop(id){
 }
 function copyShare(){ navigator.clipboard.writeText(shareTextGlobal); alert('Copy aagiduchu da!'); }
 function whatsappShare(){ window.open('https://wa.me/?text='+encodeURIComponent(shareTextGlobal)); }
-
 function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
 function openPriceSettings(){ let p=prompt('Puthu Rate Rs?', price); if(p){ price=parseInt(p); localStorage.setItem('eravur_price', price); } }
 function openAllReport(){ alert('Total: '+fmt(shops.reduce((a,s)=>a+Number(s.balance||0),0))+'\nKadai: '+shops.length); }
@@ -211,22 +239,15 @@ function exportExcel(){
   let csv='Kadai,Area,Phone,Balance\n'+shops.map(s=>`${s.name},${s.area},${s.phone||''},${s.balance}`).join('\n');
   let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='eravur-egg.csv'; a.click();
 }
-
-// ===== CLOUD - DUP FIX =====
+function openRecover(){ document.getElementById('recoverModal').classList.remove('hidden'); }
+function doRecover(){
+  try{
+    let t=document.getElementById('recoverInput').value.trim().replace(/^"|"$/g,'').replace(/\\"/g,'"');
+    let data=JSON.parse(t);
+    if(Array.isArray(data) && data.length>0){ shops=data; saveLocal(); renderShops(); closeModal('recoverModal'); alert(data.length+' kadai recover aagiduchu da machi! 🔥'); }
+    else alert('Data seri illa da!');
+  }catch(e){ alert('Paste pannathu seri illa da! Pazhaya file la F12 pannu da!'); }
+}
 async function seedBackupToCloud(){
-  if(!db) return alert('Firebase config podala da!');
-  let existing = await db.collection('shops').get();
-  if(existing.size>0 && !confirm('Already Cloud la irukku da! Overwrite pannava?')) return;
-  for(let s of shops){ await db.collection('shops').doc(s.id).set(s); }
-  document.getElementById('syncStatus').innerText='Cloud Saved ✅';
-  alert('Cloud la save aagiduchu da!');
-}
-async function loadFromCloud(){
-  if(!db){ renderShops(); return; }
-  try{ let snap=await db.collection('shops').get(); if(snap.size>0){ shops=snap.docs.map(d=>d.data()); saveLocal(); } }catch(e){}
-  renderShops(); document.getElementById('syncStatus').innerText='Ready ✅';
-}
-renderShops();
-</script>
-</body>
-</html>
+  if(!db || firebaseConfig.apiKey=="YOUR_API_KEY") return alert('Firebase config podala da machi! Pazhaya file la irunthu config copy pannu da!');
+  for
