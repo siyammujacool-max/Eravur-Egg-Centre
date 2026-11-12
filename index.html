@@ -1,490 +1,142 @@
 <!DOCTYPE html>
-<html lang="ta"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"><title>ERAVUR EGG - V22</title><script src="https://cdn.tailwindcss.com"></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script><style>html,body{height:100%;overflow:hidden;overscroll-behavior:none;background:#0a5c26}body{font-family:system-ui,-apple-system,sans-serif;-webkit-tap-highlight-color:transparent}#appContent{height:100dvh;display:flex;flex-direction:column}#scrollArea{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}input,select{font-size:16px!important}::-webkit-scrollbar{display:none}@media print{body *{visibility:hidden}#invoicePrintArea,#dailyPrintArea{display:block!important;visibility:visible;position:absolute;left:0;top:0;width:100%}}</style></head>
-<body>
-<div id="loginScreen" class="fixed inset-0 bg-[#0a5c26] z-[100] flex items-center justify-center p-4"><div class="bg-white w-full max-w-sm rounded-[28px] p-6 text-center border-2 border-black shadow-2xl"><div class="text-[40px]">🥚</div><h1 class="font-black text-[22px] leading-tight">ERAVUR EGG<br>CENTRE</h1><p class="text-[11px] font-bold text-gray-500 mt-1">V22</p><input id="loginPass" type="password" placeholder="Password" class="w-full border-2 border-black rounded-xl p-3.5 mt-5 font-bold text-center"><button onclick="doLogin()" class="w-full bg-[#0a5c26] text-white py-3.5 rounded-xl font-black border-2 border-black mt-3">Login 🔓</button><p class="text-[10px] text-gray-400 font-bold mt-3">Password: 1234</p></div></div>
+<html lang="ta"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Eravur Egg Centre</title><script src="https://cdn.tailwindcss.com"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script><style>body{font-family:system-ui}input,select{outline:none}::-webkit-scrollbar{display:none}</style></head>
+<body class="bg-[#fff7cc] min-h-screen pb-24">
+<div id="loginScreen" class="fixed inset-0 bg-[#0a5c26] z-[100] flex items-center justify-center p-4"><div class="bg-white w-full max-w-sm rounded-[28px] p-6 text-center border-4 border-black"><div class="text-[50px]">🥚</div><h1 class="font-black text-[20px]">ERAVUR EGG CENTRE</h1><p class="text-[11px] font-bold text-gray-500">V22 - Fixed</p><input id="loginPass" type="password" inputmode="numeric" placeholder="Password" class="w-full border-2 border-black rounded-xl p-3.5 mt-5 font-bold text-center text-[18px]"><button onclick="doLogin()" class="w-full bg-[#0a5c26] text-white py-3.5 rounded-xl font-black border-2 border-black mt-3">Login 🔓</button><p class="text-[10px] font-bold text-gray-400 mt-2">Password: 1234</p></div></div>
+<div id="appContent" class="hidden max-w-md mx-auto">
+<div class="bg-[#0a5c26] text-white p-4 rounded-b-[24px] border-b-4 border-black sticky top-0 z-40"><div class="flex justify-between items-center"><div><h1 class="font-black text-[16px]">🥚 ERAVUR EGG CENTRE</h1><p class="text-[10px] font-bold opacity-80">V22 Fixed • Palaya Kanaku Safe</p></div><div class="flex gap-1.5"><button onclick="restoreDatabase()" class="bg-orange-400 text-black px-2.5 py-2 rounded-full font-black border-2 border-black text-[11px]">DB ♻️</button><button onclick="openAutoSettings()" class="bg-white text-black px-2.5 py-2 rounded-full font-black border-2 border-black text-[11px]">🔔</button><button onclick="doLogout()" class="bg-white text-black px-2.5 py-2 rounded-full font-black border-2 border-black text-[11px]">🚪</button></div></div>
+<div class="bg-white text-black rounded-[18px] p-3 mt-3 border-2 border-black flex justify-between items-center"><div><div class="text-[10px] font-bold text-gray-500">TOTAL BALANCE</div><div id="totBalance" class="font-black text-[20px] text-red-600">Rs.0</div><div id="totCount" class="text-[10px] font-bold">0 kadai</div></div><button onclick="openAddShop()" class="bg-[#ffde59] px-4 py-3 rounded-xl font-black border-2 border-black text-[12px]">+ கடை</button></div>
+<div class="flex gap-1.5 mt-3"><button onclick="openAllReport()" class="flex-1 bg-white text-black py-2.5 rounded-xl font-black border-2 border-black text-[11px]">📊 All</button><button onclick="openDaily()" class="flex-1 bg-white text-black py-2.5 rounded-xl font-black border-2 border-black text-[11px]">📅 Daily</button><button onclick="openPriceSettings()" class="flex-1 bg-white text-black py-2.5 rounded-xl font-black border-2 border-black text-[11px]">⚙️ Price</button><button onclick="openPriceHistory()" class="flex-1 bg-white text-black py-2.5 rounded-xl font-black border-2 border-black text-[11px]">📅 Hist</button></div></div>
+<div class="p-3"><div class="flex gap-2"><input id="search" oninput="renderShops()" placeholder="🔍 Kadai thedu..." class="flex-1 border-2 border-black rounded-xl p-3 font-bold bg-white"><button onclick="clearSearch()" class="bg-white px-3 rounded-xl font-black border-2 border-black">X</button></div>
+<div class="flex gap-1.5 mt-2 overflow-x-auto"><button id="filterALL" onclick="setAreaFilter('ALL')" class="area-filter-btn bg-[#ffde59] px-3 py-2 rounded-full font-black border-2 border-black text-[11px] whitespace-nowrap">ALL</button><button id="filterEravur" onclick="setAreaFilter('Eravur')" class="area-filter-btn bg-white px-3 py-2 rounded-full font-black border-2 border-black text-[11px] whitespace-nowrap">Eravur</button><button id="filterKalladi" onclick="setAreaFilter('Kalladi')" class="area-filter-btn bg-white px-3 py-2 rounded-full font-black border-2 border-black text-[11px] whitespace-nowrap">Kalladi</button><button id="filterChenkalady" onclick="setAreaFilter('Chenkalady')" class="area-filter-btn bg-white px-3 py-2 rounded-full font-black border-2 border-black text-[11px] whitespace-nowrap">Chenkalady</button><button id="filterBatticaloa" onclick="setAreaFilter('Batticaloa')" class="area-filter-btn bg-white px-3 py-2 rounded-full font-black border-2 border-black text-[11px] whitespace-nowrap">Batticaloa</button><button id="filterOther" onclick="setAreaFilter('Other')" class="area-filter-btn bg-white px-3 py-2 rounded-full font-black border-2 border-black text-[11px] whitespace-nowrap">Other</button></div>
+<div id="shopList" class="mt-3 space-y-3"><div class="text-center py-10 font-black">Loading... 🥚</div></div></div></div>
 
-<div id="appContent" class="hidden">
-<div class="bg-[#0a5c26] text-white px-3 pt-3 pb-2 shrink-0">
-<div class="flex justify-between items-center"><div class="flex items-center gap-2"><div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-[20px] border-2 border-black">🥚</div><div><div class="font-black leading-none text-[15px]">ERAVUR<br>EGG</div><div class="text-[10px] font-black bg-white text-black px-1.5 rounded-full inline-block mt-1">V22</div></div></div>
-<div class="flex gap-1.5"><button onclick="openAutoSettings()" class="bg-[#ffde59] text-black w-11 h-11 rounded-full font-black border-2 border-black text-[10px] leading-tight">AUTO<br>🔔</button><button onclick="openPriceSettings()" class="bg-[#ffde59] text-black w-11 h-11 rounded-full font-black border-2 border-black text-[10px] leading-tight">விலை<br>⚙️</button><button onclick="openPriceHistory()" class="bg-blue-400 text-white w-11 h-11 rounded-full font-black border-2 border-black text-[10px] leading-tight">HIST<br>📅</button><button onclick="restoreDatabase()" class="bg-orange-500 text-white w-11 h-11 rounded-full font-black border-2 border-black text-[10px] leading-tight">DB<br>♻️</button><button onclick="doLogout()" class="bg-white text-black px-2 h-11 rounded-full font-black border-2 border-black text-[10px]">Logout</button></div></div>
-<div class="flex gap-2 mt-3"><div class="flex-1 bg-white rounded-full flex items-center px-3 border-2 border-black"><span class="text-[14px]">🔍</span><input id="search" oninput="renderShops()" placeholder="தேடு..." class="flex-1 py-2.5 px-2 outline-none font-bold text-black bg-transparent"><button onclick="clearSearch()" class="text-black font-black px-1">✕</button></div><button onclick="openAddShop()" class="bg-[#ffde59] text-black px-4 rounded-full font-black border-2 border-black text-[12px]">+ கடை</button></div>
-<div class="flex gap-2 mt-2 overflow-x-auto pb-1"><button id="filterALL" onclick="setAreaFilter('ALL')" class="area-filter-btn bg-white text-black px-4 py-1.5 rounded-full font-black border-2 border-black text-[12px] shrink-0">ALL</button><button id="filterEravur" onclick="setAreaFilter('Eravur')" class="area-filter-btn bg-white text-black px-4 py-1.5 rounded-full font-black border-2 border-black text-[12px] shrink-0">Eravur</button><button id="filterOddamavadi" onclick="setAreaFilter('Oddamavadi')" class="area-filter-btn bg-white text-black px-4 py-1.5 rounded-full font-black border-2 border-black text-[12px] shrink-0">Oddamavadi</button><button id="filterChenkallady" onclick="setAreaFilter('Chenkallady')" class="area-filter-btn bg-white text-black px-4 py-1.5 rounded-full font-black border-2 border-black text-[12px] shrink-0">Chenkallady</button><button id="filterValaichenai" onclick="setAreaFilter('Valaichenai')" class="area-filter-btn bg-white text-black px-4 py-1.5 rounded-full font-black border-2 border-black text-[12px] shrink-0">Valaichenai</button></div>
-</div>
-<div id="scrollArea"><div class="p-3 pb-4"><div class="bg-white rounded-[18px] border-2 border-black p-3 flex justify-between items-center"><div><div class="text-[10px] font-bold text-gray-500">TOTAL BALANCE</div><div id="totBalance" class="font-black text-[18px]">Rs.0</div></div><div id="totCount" class="text-[11px] font-black bg-yellow-100 px-2 py-1 rounded-full border-2 border-black">0 kadai</div></div><div id="shopList" class="space-y-3 mt-3"><div class="text-center py-10"><div class="text-[30px] animate-spin inline-block">◐</div><div class="font-black mt-2">Loading da machi...</div><div class="text-[11px] font-bold text-gray-500">DB connect aaguthu...</div></div></div></div></div>
-<div class="bg-white border-t-2 border-black px-3 py-2 flex gap-2 shrink-0"><button onclick="openDailyReport()" class="flex-1 bg-[#ffde59] py-3 rounded-xl font-black border-2 border-black text-[12px]">📅<br>DAILY</button><button onclick="openAllReport()" class="flex-1 bg-[#0a5c26] text-white py-3 rounded-xl font-black border-2 border-black text-[12px]">📊<br>REPORTS</button><button onclick="exportExcel()" class="flex-1 bg-white py-3 rounded-xl font-black border-2 border-black text-[12px]">📥<br>Excel</button></div>
-</div><div id="addShopModal" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5"><h3 class="font-black text-[15px]">🏪 Puthu Kadai</h3><input id="newShopName" placeholder="Kadai Peru *" class="w-full border-2 border-black rounded-xl p-3 mt-3 font-bold"><select id="newShopArea" class="w-full border-2 border-black rounded-xl p-3 mt-2 font-bold"><option>Eravur</option><option>Oddamavadi</option><option>Chenkallady</option><option>Valaichenai</option></select><input id="newShopPhone" placeholder="Phone - 0771234567" class="w-full border-2 border-black rounded-xl p-3 mt-2 font-bold"><div class="grid grid-cols-2 gap-2 mt-2"><div><label class="text-[11px] font-black">Old Balance</label><input id="newOldBal" type="number" value="0" class="w-full border-2 border-black rounded-xl p-3 font-bold"></div><div><label class="text-[11px] font-black">Old Paid</label><input id="newOldPaid" type="number" value="0" class="w-full border-2 border-black rounded-xl p-3 font-bold"></div></div><div class="flex gap-3 mt-4"><button onclick="closeAddShop()" class="flex-1 bg-gray-100 py-3.5 rounded-xl font-black border-2 border-black">Cancel</button><button onclick="saveNewShop()" class="flex-1 bg-[#0a5c26] text-white py-3.5 rounded-xl font-black border-2 border-black">Save ✅</button></div></div></div>
-
-<div id="editShopModal" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><h3 class="font-black text-[15px]">✏️ Kadai Edit</h3><p id="editLabel" class="text-[11px] font-bold text-gray-500 mt-1"></p><input id="editName" class="w-full border-2 border-black rounded-xl p-3 mt-3 font-bold"><select id="editArea" class="w-full border-2 border-black rounded-xl p-3 mt-2 font-bold"><option>Eravur</option><option>Oddamavadi</option><option>Chenkallady</option><option>Valaichenai</option></select><input id="editPhone" class="w-full border-2 border-black rounded-xl p-3 mt-2 font-bold"><div class="grid grid-cols-2 gap-2 mt-2"><div><label class="text-[11px] font-black">Old Balance</label><input id="editOldBal" type="number" oninput="calcEditShopLive()" class="w-full border-2 border-black rounded-xl p-3 font-bold"></div><div><label class="text-[11px] font-black">Old Paid</label><input id="editOldPaid" type="number" oninput="calcEditShopLive()" class="w-full border-2 border-black rounded-xl p-3 font-bold"></div></div><div id="editShopLive" class="bg-yellow-100 border-2 border-black rounded-xl p-3 mt-3 font-black text-center text-[13px]">LIVE REM: Rs.0</div><div class="flex gap-3 mt-4"><button onclick="closeEditShop()" class="flex-1 bg-gray-100 py-3.5 rounded-xl font-black border-2 border-black">Cancel</button><button onclick="saveEditShop()" class="flex-1 bg-[#0a5c26] text-white py-3.5 rounded-xl font-black border-2 border-black">Update ✅</button></div><button onclick="deleteShop()" class="w-full bg-red-100 text-red-600 py-3 rounded-xl font-black border-2 border-black mt-2 text-[12px]">🗑️ Kadai Delete</button></div></div>
-
-<div id="saleModal" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><div class="flex justify-between"><h3 class="font-black text-[15px]">🥚 New Sale</h3><button onclick="closeSale()" class="bg-gray-100 px-3 py-1 rounded-full font-black border-2 border-black">X</button></div><p id="saleShopName" class="font-black text-[#0a5c26] mt-1"></p><input id="saleDate" type="date" class="w-full border-2 border-black rounded-xl p-3 mt-3 font-bold"><div id="saleInputs" class="space-y-3 mt-3"></div><div class="bg-yellow-50 border-2 border-black rounded-xl p-3 mt-3"><div class="flex justify-between text-[12px] font-bold"><span>Total Eggs</span><span id="saleEggs">0 eggs</span></div><div class="flex justify-between text-[12px] font-bold mt-1"><span>Today Sale</span><span id="saleToday">Rs.0</span></div><div class="flex justify-between text-[12px] font-bold mt-1"><span>Old Balance</span><span id="saleOldShow">Rs.0</span></div><div class="flex justify-between text-[12px] font-bold mt-1"><span>Paid Now</span><span id="salePaidShow">Rs.0</span></div><div class="flex justify-between font-black text-[14px] mt-2 pt-2 border-t-2 border-black"><span>Grand Balance</span><span id="saleGrand">Rs.0</span></div><p id="saleDetails" class="text-[10px] font-bold text-gray-500 mt-1"></p></div><label class="text-[11px] font-black mt-3 block">Paid Now (Ippo Kattinathu)</label><div class="flex gap-2 mt-1"><input id="salePaidNow" type="number" oninput="calcSale()" placeholder="0" class="flex-1 border-2 border-black rounded-xl p-3 font-bold"><button onclick="setSalePaid(5000)" class="bg-gray-100 px-3 rounded-xl font-black border-2 border-black text-[12px]">5000</button><button onclick="setSalePaidFull()" class="bg-gray-100 px-3 rounded-xl font-black border-2 border-black text-[12px]">Full</button></div><button id="saveSaleBtn" onclick="confirmSale()" class="w-full bg-[#0a5c26] text-white py-4 rounded-xl font-black border-2 border-black mt-4">Save Sale + Invoice 🧾</button></div></div>
-
-<div id="payModal" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5"><h3 class="font-black text-[15px]">💰 Payment</h3><p id="payShopName" class="font-black text-[#0a5c26] mt-1"></p><p class="text-[12px] font-bold mt-1">Balance: <span id="payBalance" class="text-red-600">Rs.0</span></p><input id="payDate" type="date" class="w-full border-2 border-black rounded-xl p-3 mt-3 font-bold"><input id="payAmount" type="number" placeholder="Amount - Rs." class="w-full border-2 border-black rounded-xl p-3 mt-2 font-bold text-[18px]"><div class="flex gap-2 mt-2"><button onclick="setPayHalf()" class="flex-1 bg-gray-100 py-2.5 rounded-xl font-black border-2 border-black text-[12px]">Half</button><button onclick="setPayFull()" class="flex-1 bg-gray-100 py-2.5 rounded-xl font-black border-2 border-black text-[12px]">Full Balance</button></div><div class="flex gap-3 mt-4"><button onclick="closePay()" class="flex-1 bg-gray-100 py-3.5 rounded-xl font-black border-2 border-black">Cancel</button><button onclick="confirmPay()" class="flex-1 bg-green-600 text-white py-3.5 rounded-xl font-black border-2 border-black">Save Paid ✅</button></div></div></div><div id="reportModal" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><div class="flex justify-between items-center"><h3 class="font-black text-[15px]">📊 Kadai Report</h3><button onclick="closeReport()" class="bg-gray-100 px-3 py-1 rounded-full font-black border-2 border-black">X</button></div><div id="reportContent" class="mt-3"></div></div></div>
-
-<div id="editSaleTxModal" class="hidden fixed inset-0 bg-black/70 z-[95] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><h3 class="font-black text-[14px]">✏️ Sale Edit</h3><p id="editSaleTxInfo" class="text-[11px] font-bold text-gray-500 mt-1"></p><input id="editSaleTxDate" type="date" class="w-full border-2 border-black rounded-xl p-3 mt-3 font-bold"><div id="editSaleTxInputs" class="space-y-3 mt-3"></div><div class="bg-yellow-50 border-2 border-black rounded-xl p-3 mt-3"><div class="flex justify-between text-[12px] font-bold"><span>Eggs</span><span id="editSaleTxEggs">0 eggs</span></div><div class="flex justify-between text-[12px] font-bold mt-1"><span>New Total</span><span id="editSaleTxToday">Rs.0</span></div><div class="flex justify-between text-[12px] font-bold mt-1"><span>Old Total</span><span id="editSaleTxOldTotal">Rs.0</span></div><div class="flex justify-between font-black mt-1"><span>Difference</span><span id="editSaleTxDiff">Rs.0</span></div></div><div class="flex gap-3 mt-4"><button onclick="closeEditSaleTx()" class="flex-1 bg-gray-100 py-3.5 rounded-xl font-black border-2 border-black">Cancel</button><button id="saveEditSaleTxBtn" onclick="saveEditSaleTx()" class="flex-1 bg-[#0a5c26] text-white py-3.5 rounded-xl font-black border-2 border-black">Update ✅</button></div><button onclick="deleteEditSaleTx()" class="w-full bg-red-100 text-red-600 py-3 rounded-xl font-black border-2 border-black mt-2 text-[12px]">🗑️ Sale Delete</button></div></div>
-
-<div id="editPayTxModal" class="hidden fixed inset-0 bg-black/70 z-[95] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5"><h3 class="font-black text-[14px]">✏️ Paid Edit</h3><p id="editPayTxInfo" class="text-[11px] font-bold text-gray-500 mt-1"></p><input id="editPayTxDate" type="date" class="w-full border-2 border-black rounded-xl p-3 mt-3 font-bold"><input id="editPayTxAmount" type="number" oninput="calcEditPayTxLive()" class="w-full border-2 border-black rounded-xl p-3 mt-2 font-bold text-[18px]"><div id="editPayTxLive" class="bg-yellow-100 border-2 border-black rounded-xl p-3 mt-3 font-black text-center text-[13px]">New Balance: Rs.0</div><div class="flex gap-3 mt-4"><button onclick="closeEditPayTx()" class="flex-1 bg-gray-100 py-3.5 rounded-xl font-black border-2 border-black">Cancel</button><button id="saveEditPayTxBtn" onclick="saveEditPayTx()" class="flex-1 bg-[#0a5c26] text-white py-3.5 rounded-xl font-black border-2 border-black">Update ✅</button></div><button onclick="deleteEditPayTx()" class="w-full bg-red-100 text-red-600 py-3 rounded-xl font-black border-2 border-black mt-2 text-[12px]">🗑️ Paid Delete</button></div></div>
-
-<div id="shareModal" class="hidden fixed inset-0 bg-black/70 z-[95] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5"><h3 class="font-black text-[14px]">📤 Share Bill</h3><p id="shareShopName" class="text-[12px] font-bold text-gray-600 mt-1"></p><div id="sharePreview" class="bg-gray-50 border-2 border-black rounded-xl p-3 mt-3 text-[12px] font-bold whitespace-pre-line"></div><div class="grid grid-cols-2 gap-2 mt-3"><button onclick="shareEnglish()" class="bg-[#0a5c26] text-white py-3 rounded-xl font-black border-2 border-black text-[12px]">🇬🇧 English</button><button onclick="shareTamil()" class="bg-[#ffde59] py-3 rounded-xl font-black border-2 border-black text-[12px]">🇱🇰 Tamil</button></div><button onclick="copyShareText()" class="w-full bg-gray-100 py-3 rounded-xl font-black border-2 border-black mt-2 text-[12px]">📋 Copy Text</button><button onclick="closeShare()" class="w-full bg-white py-3 rounded-xl font-black border-2 border-black mt-2 text-[12px]">Close</button></div></div>
-
-<div id="invoiceModal" class="hidden fixed inset-0 bg-black/70 z-[96] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><div id="invoicePrintArea"><div class="text-center"><div class="font-black text-[18px]">🥚 ERAVUR EGG CENTRE</div><div class="text-[11px] font-bold">Eravur • 077 123 4567</div><div class="flex justify-between text-[11px] font-bold mt-2"><span id="invNo">INV-</span><span id="invDate"></span></div></div><div class="border-t-2 border-dashed border-black mt-2 pt-2"><div class="font-black" id="invShop"></div><div class="text-[11px] font-bold"><span id="invArea"></span> • <span id="invPhone"></span></div></div><table class="w-full text-[12px] mt-2"><thead><tr class="border-b-2 border-black"><th class="text-left p-2">Item</th><th class="p-2">Qty</th><th class="p-2">Rate</th><th class="text-right p-2">Amt</th></tr></thead><tbody id="invItems"></tbody></table><div class="border-t-2 border-dashed border-black mt-2 pt-2 text-[12px] font-bold space-y-1"><div class="flex justify-between"><span id="invEggs">0 eggs</span><span id="invTotal">Rs.0</span></div><div class="flex justify-between"><span>Old Balance</span><span id="invOld">Rs.0</span></div><div class="flex justify-between"><span>Total</span><span id="invTotalBal">Rs.0</span></div><div class="flex justify-between text-green-700"><span>Paid</span><span id="invPaid">Rs.0</span></div><div class="flex justify-between font-black text-[15px] pt-1 border-t-2 border-black"><span>Balance</span><span id="invBalance">Rs.0</span></div></div><p class="text-center text-[10px] font-bold mt-3">Thank You! 🙏 Please Pay On Time</p></div><div class="grid grid-cols-2 gap-2 mt-4"><button onclick="printInvoice()" class="bg-gray-100 py-3.5 rounded-xl font-black border-2 border-black text-[12px]">🖨️ Print</button><button onclick="shareInvoice()" class="bg-[#0a5c26] text-white py-3.5 rounded-xl font-black border-2 border-black text-[12px]">📤 WhatsApp</button></div><button onclick="closeInvoice()" class="w-full bg-gray-100 py-3 rounded-xl font-black border-2 border-black mt-2 text-[12px]">Close</button></div></div>
-
-<div id="dailyReportModal" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><div class="flex justify-between items-center"><h3 class="font-black text-[15px]">📅 Daily Report</h3><button onclick="closeDailyReport()" class="bg-gray-100 px-3 py-1 rounded-full font-black border-2 border-black">X</button></div><input id="dailyReportDate" type="date" onchange="renderDailyReport()" class="w-full border-2 border-black rounded-xl p-3 mt-3 font-bold"><div id="dailyReportContent" class="mt-3"></div><div class="grid grid-cols-2 gap-2 mt-3"><button onclick="shareDailyReport()" class="bg-[#0a5c26] text-white py-3 rounded-xl font-black border-2 border-black text-[12px]">📤 WhatsApp</button><button onclick="printDailyReport()" class="bg-gray-100 py-3 rounded-xl font-black border-2 border-black text-[12px]">🖨️ Print</button></div></div></div>
-
-<div id="allReportModal" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><div class="flex justify-between items-center"><h3 class="font-black text-[15px]">📊 All Reports</h3><button onclick="closeAllReport()" class="bg-gray-100 px-3 py-1 rounded-full font-black border-2 border-black">X</button></div><div id="allReportContent" class="mt-3"></div></div></div><div id="autoModal" class="hidden fixed inset-0 bg-black/70 z-[95] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5"><h3 class="font-black text-[14px]">🔔 AUTO WhatsApp Settings</h3><p class="text-[11px] text-gray-600 font-bold mt-1">Sale pannum pothu thana WhatsApp Bill anuppanuma?</p><div class="space-y-2 mt-4"><label class="flex justify-between items-center border-2 border-black rounded-xl p-3 font-black text-[13px]">Sale Bill Auto Send <input id="autoSale" type="checkbox" checked class="w-5 h-5"></label><label class="flex justify-between items-center border-2 border-black rounded-xl p-3 font-black text-[13px]">Payment Auto Send <input id="autoPay" type="checkbox" checked class="w-5 h-5"></label><label class="flex justify-between items-center border-2 border-black rounded-xl p-3 font-black text-[13px]">Tamil Message <input id="autoTamil" type="checkbox" class="w-5 h-5"></label></div><div class="flex gap-3 mt-4"><button onclick="closeAutoSettings()" class="flex-1 bg-gray-100 py-3.5 rounded-xl font-black border-2 border-black">Cancel</button><button onclick="saveAutoSettings()" class="flex-1 bg-[#0a5c26] text-white py-3.5 rounded-xl font-black border-2 border-black">Save</button></div></div></div>
-
-<div id="priceModal" class="hidden fixed inset-0 bg-black/70 z-[95] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><h3 class="font-black text-[14px]">⚙️ விலை Settings - Tray Rate</h3><p class="text-[11px] text-gray-600 font-bold mt-1">W30 = 30 eggs tray, W36 = 36 eggs tray</p><div id="priceInputs" class="space-y-3 mt-4"></div><div class="flex gap-3 mt-4"><button onclick="closePriceSettings()" class="flex-1 bg-gray-100 py-3.5 rounded-xl font-black border-2 border-black">Cancel</button><button onclick="savePriceSettings()" class="flex-1 bg-[#0a5c26] text-white py-3.5 rounded-xl font-black border-2 border-black">Save Price ✅</button></div></div></div>
-
-<div id="priceHistModal" class="hidden fixed inset-0 bg-black/70 z-[95] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><div class="flex justify-between items-center"><h3 class="font-black text-[14px]">📅 Price History</h3><button onclick="closePriceHistory()" class="bg-gray-100 px-3 py-1 rounded-full font-black border-2 border-black">X</button></div><div id="priceHistContent" class="mt-3"></div></div></div>
-
-<div id="autoPopup" class="hidden fixed inset-0 bg-black/70 z-[98] flex items-center justify-center p-4"><div class="bg-white w-full max-w-sm rounded-[24px] p-5 text-center border-2 border-black"><h3 id="autoPopupTitle" class="font-black text-[15px]">✅ Sale Saved!</h3><p id="autoPopupShop" class="text-[12px] font-bold text-gray-600 mt-1"></p><p class="text-[11px] font-bold mt-3">Bill-a eppadi anuppuvatha?</p><div class="grid grid-cols-2 gap-2 mt-3"><button onclick="sendAutoEnglish()" class="bg-[#0a5c26] text-white py-3 rounded-xl font-black border-2 border-black text-[12px]">🇬🇧 English</button><button onclick="sendAutoTamil()" class="bg-[#ffde59] py-3 rounded-xl font-black border-2 border-black text-[12px]">🇱🇰 Tamil</button></div><button onclick="closeAutoPopup()" class="w-full bg-gray-100 py-3 rounded-xl font-black border-2 border-black mt-2 text-[12px]">Skip</button></div></div>
-
-<div id="payInvoicePrintArea" style="display:none"></div>
-<div id="dailyPrintArea" style="display:none"></div>
+<!-- MODALS -->
+<div id="addShopModal" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5"><h3 class="font-black">+ Puthu Kadai</h3><input id="newShopName" placeholder="Kadai Peru" class="w-full border-2 border-black rounded-xl p-3 font-bold mt-3"><select id="newShopArea" class="w-full border-2 border-black rounded-xl p-3 font-bold mt-2"><option>Eravur</option><option>Kalladi</option><option>Chenkalady</option><option>Batticaloa</option><option>Other</option></select><input id="newShopPhone" placeholder="Phone - 77xxxxxxx" class="w-full border-2 border-black rounded-xl p-3 font-bold mt-2"><label class="text-[11px] font-black mt-3 block">Old Balance</label><input id="newOldBal" type="number" value="0" class="w-full border-2 border-black rounded-xl p-3 font-bold"><div class="flex gap-3 mt-4"><button onclick="closeAddShop()" class="flex-1 bg-gray-100 py-3.5 rounded-xl font-black border-2 border-black">Cancel</button><button onclick="saveNewShop()" class="flex-1 bg-[#0a5c26] text-white py-3.5 rounded-xl font-black border-2 border-black">Save ✅</button></div></div></div>
+<div id="editShopModal" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><h3 class="font-black">✏️ Edit Kadai</h3><p id="editLabel" class="text-[11px] font-bold text-gray-500"></p><p id="editShopLive" class="font-black text-green-600 text-[12px] mt-1"></p><input id="editName" class="w-full border-2 border-black rounded-xl p-3 font-bold mt-3"><select id="editArea" class="w-full border-2 border-black rounded-xl p-3 font-bold mt-2"><option>Eravur</option><option>Kalladi</option><option>Chenkalady</option><option>Batticaloa</option><option>Other</option></select><input id="editPhone" class="w-full border-2 border-black rounded-xl p-3 font-bold mt-2"><div class="grid grid-cols-2 gap-2 mt-2"><div><label class="text-[11px] font-black">Old Balance</label><input id="editOldBal" type="number" oninput="calcEditShopLive()" class="w-full border-2 border-black rounded-xl p-3 font-bold"></div><div><label class="text-[11px] font-black">Old Paid</label><input id="editOldPaid" type="number" oninput="calcEditShopLive()" class="w-full border-2 border-black rounded-xl p-3 font-bold"></div></div><div class="flex gap-3 mt-4"><button onclick="closeEditShop()" class="flex-1 bg-gray-100 py-3.5 rounded-xl font-black border-2 border-black">Cancel</button><button onclick="saveEditShop()" class="flex-1 bg-[#0a5c26] text-white py-3.5 rounded-xl font-black border-2 border-black">Save ✅</button></div><button onclick="deleteShop()" class="w-full bg-red-100 text-red-600 py-3 rounded-xl font-black border-2 border-black mt-2 text-[12px]">🗑️ Delete Kadai</button></div></div>
+<div id="saleModal" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><div class="flex justify-between"><h3 class="font-black">🥚 New Sale</h3><button onclick="closeSale()" class="font-black">X</button></div><p id="saleShopName" class="text-[11px] font-bold text-gray-500"></p><input id="saleDate" type="date" class="w-full border-2 border-black rounded-xl p-3 font-bold mt-3"><div id="saleInputs" class="space-y-2 mt-3"></div><div class="bg-yellow-50 border-2 border-black rounded-xl p-3 mt-3 text-[12px] font-bold space-y-1"><div class="flex justify-between"><span>Eggs</span><span id="saleEggs">0 eggs</span></div><div class="flex justify-between"><span>Today Sale</span><span id="saleToday">Rs.0</span></div><div class="flex justify-between"><span>Old Balance</span><span id="saleOldShow">Rs.0</span></div><div class="flex justify-between"><span>Paid Now</span><span id="salePaidShow">Rs.0</span></div><div class="flex justify-between border-t-2 border-black pt-1"><span>Grand Balance</span><span id="saleGrand" class="text-red-600">Rs.0</span></div><div id="saleDetails" class="text-[10px] text-gray-500"></div></div><label class="text-[11px] font-black mt-3 block">Paid Now</label><input id="salePaidNow" type="number" oninput="calcSale()" placeholder="0" class="w-full border-2 border-black rounded-xl p-3 font-bold"><div class="grid grid-cols-3 gap-2 mt-2"><button onclick="setSalePaid(0)" class="bg-gray-100 py-2.5 rounded-xl font-black border-2 border-black text-[11px]">Clear</button><button onclick="setSalePaidHalf()" class="bg-gray-100 py-2.5 rounded-xl font-black border-2 border-black text-[11px]">Half</button><button onclick="setSalePaidFull()" class="bg-[#ffde59] py-2.5 rounded-xl font-black border-2 border-black text-[11px]">Full</button></div><button onclick="confirmSale()" id="saveSaleBtn" class="w-full bg-[#0a5c26] text-white py-4 rounded-xl font-black border-2 border-black mt-4">Save Sale + Invoice 🧾</button></div></div>
+<div id="payModal" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5"><h3 class="font-black">💰 Paid</h3><p id="payShopName" class="text-[11px] font-bold text-gray-500"></p><div class="bg-green-50 border-2 border-black rounded-xl p-3 mt-3 text-center"><div class="text-[10px] font-bold">BALANCE</div><div id="payBalance" class="font-black text-[18px]">Rs.0</div></div><div class="grid grid-cols-2 gap-2 mt-3"><button onclick="selectPayMode('old')" id="payOldBtn" class="bg-orange-400 py-3 rounded-xl font-black border-2 border-black text-[12px]">🧾 Old Pay</button><button onclick="selectPayMode('sale')" id="paySaleBtn" class="bg-blue-400 py-3 rounded-xl font-black border-2 border-black text-[12px]">💵 Sale Pay</button></div><div id="payInputArea" class="hidden mt-3"><p id="selectedLabel" class="font-black text-[12px]"></p><input id="payDate" type="date" class="w-full border-2 border-black rounded-xl p-3 font-bold mt-2"><input id="payAmount" type="number" oninput="calcPayLive()" placeholder="Amount" class="w-full border-2 border-black rounded-xl p-3 font-bold mt-2"><p id="payLiveRemain" class="font-black text-[12px] mt-1"></p><div class="grid grid-cols-2 gap-2 mt-2"><button onclick="setPayHalf()" class="bg-gray-100 py-2.5 rounded-xl font-black border-2 border-black text-[11px]">Half</button><button onclick="setPayFull()" class="bg-[#ffde59] py-2.5 rounded-xl font-black border-2 border-black text-[11px]">Full</button></div><button onclick="confirmPay()" class="w-full bg-[#0a5c26] text-white py-3.5 rounded-xl font-black border-2 border-black mt-3">Save Paid ✅</button></div><button onclick="closePay()" class="w-full bg-gray-100 py-3 rounded-xl font-black border-2 border-black mt-3">Close</button></div></div>
+<div id="reportModal" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><div class="flex justify-between"><h3 class="font-black">📊 Report</h3><button onclick="closeReport()" class="font-black">X</button></div><div id="reportContent" class="mt-3"></div></div></div>
+<div id="shareModal" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5"><h3 class="font-black">📤 Share Bill</h3><p id="shareShopName" class="text-[11px] font-bold text-gray-500"></p><pre id="sharePreview" class="bg-gray-50 border-2 border-black rounded-xl p-3 mt-3 text-[11px] font-bold whitespace-pre-wrap"></pre><div class="grid grid-cols-2 gap-2 mt-3"><button onclick="shareEnglish()" class="bg-[#0a5c26] text-white py-3 rounded-xl font-black border-2 border-black text-[12px]">🇬🇧 English</button><button onclick="shareTamil()" class="bg-[#ffde59] py-3 rounded-xl font-black border-2 border-black text-[12px]">🇱🇰 Tamil</button></div><button onclick="copyShareText()" class="w-full bg-gray-100 py-3 rounded-xl font-black border-2 border-black mt-2 text-[12px]">📋 Copy</button><button onclick="closeShare()" class="w-full bg-gray-100 py-3 rounded-xl font-black border-2 border-black mt-2 text-[12px]">Close</button></div></div>
+<div id="invoiceModal" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><div class="flex justify-between"><h3 class="font-black">🧾 Invoice</h3><button onclick="closeInvoice()" class="font-black">X</button></div><div id="invoicePrintArea"><div class="text-center"><div class="font-black text-[16px]">🥚 ERAVUR EGG CENTRE</div><div class="text-[11px] font-bold"><span id="invNo"></span> • <span id="invDate"></span></div></div><div class="font-black mt-3"><span id="invShop"></span></div><div class="text-[11px] font-bold"><span id="invArea"></span> • <span id="invPhone"></span></div><table class="w-full text-[12px] mt-3"><tbody id="invItems"></tbody></table><div class="text-right text-[11px] font-bold mt-2">Eggs: <span id="invEggs"></span></div><div class="space-y-1 text-[12px] font-bold mt-2 border-t-2 border-black pt-2"><div class="flex justify-between"><span>Total</span><span id="invTotal"></span></div><div class="flex justify-between"><span>Old</span><span id="invOld"></span></div><div class="flex justify-between"><span>Paid</span><span id="invPaid"></span></div><div class="flex justify-between"><span>Balance</span><span id="invBalance" class="text-red-600"></span></div></div></div><div class="grid grid-cols-2 gap-2 mt-4"><button onclick="shareInvoice()" class="bg-[#0a5c26] text-white py-3 rounded-xl font-black border-2 border-black text-[12px]">📤 Share</button><button onclick="printInvoice()" class="bg-gray-100 py-3 rounded-xl font-black border-2 border-black text-[12px]">🖨️ Print</button></div></div></div>
+<div id="editSaleTxModal" class="hidden fixed inset-0 bg-black/70 z-[95] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><h3 class="font-black">✏️ Edit Sale</h3><p id="editSaleTxInfo" class="text-[11px] font-bold text-gray-500"></p><input id="editSaleTxDate" type="date" class="w-full border-2 border-black rounded-xl p-3 font-bold mt-3"><div id="editSaleTxInputs" class="space-y-2 mt-3"></div><div class="bg-yellow-50 border-2 border-black rounded-xl p-3 mt-3 text-[12px] font-bold"><div class="flex justify-between"><span>Eggs</span><span id="editSaleTxEggs"></span></div><div class="flex justify-between"><span>New Total</span><span id="editSaleTxToday"></span></div><div class="flex justify-between"><span>Old Total</span><span id="editSaleTxOldTotal"></span></div><div class="flex justify-between"><span>Diff</span><span id="editSaleTxDiff"></span></div></div><div class="flex gap-2 mt-4"><button onclick="closeEditSaleTx()" class="flex-1 bg-gray-100 py-3 rounded-xl font-black border-2 border-black">Cancel</button><button onclick="saveEditSaleTx()" class="flex-1 bg-[#0a5c26] text-white py-3 rounded-xl font-black border-2 border-black">Save ✅</button></div><button onclick="deleteEditSaleTx()" class="w-full bg-red-100 text-red-600 py-3 rounded-xl font-black border-2 border-black mt-2 text-[12px]">🗑️ Delete Sale</button></div></div>
+<div id="editPayTxModal" class="hidden fixed inset-0 bg-black/70 z-[95] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5"><h3 class="font-black">✏️ Edit Paid</h3><p id="editPayTxInfo" class="text-[11px] font-bold text-gray-500"></p><input id="editPayTxDate" type="date" class="w-full border-2 border-black rounded-xl p-3 font-bold mt-3"><input id="editPayTxAmount" type="number" oninput="calcEditPayTxLive()" class="w-full border-2 border-black rounded-xl p-3 font-bold mt-2"><p id="editPayTxLive" class="font-black text-[12px] mt-2"></p><div class="flex gap-2 mt-4"><button onclick="closeEditPayTx()" class="flex-1 bg-gray-100 py-3 rounded-xl font-black border-2 border-black">Cancel</button><button onclick="saveEditPayTx()" class="flex-1 bg-[#0a5c26] text-white py-3 rounded-xl font-black border-2 border-black">Save ✅</button></div><button onclick="deleteEditPayTx()" class="w-full bg-red-100 text-red-600 py-3 rounded-xl font-black border-2 border-black mt-2 text-[12px]">🗑️ Delete Paid</button></div></div>
+<div id="autoModal" class="hidden fixed inset-0 bg-black/70 z-[95] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5"><h3 class="font-black">🔔 AUTO WhatsApp Settings</h3><div class="space-y-2 mt-4"><label class="flex justify-between border-2 border-black rounded-xl p-3 font-black text-[13px]">Sale Bill Auto Send <input id="autoSale" type="checkbox" checked class="w-5 h-5"></label><label class="flex justify-between border-2 border-black rounded-xl p-3 font-black text-[13px]">Payment Auto Send <input id="autoPay" type="checkbox" checked class="w-5 h-5"></label><label class="flex justify-between border-2 border-black rounded-xl p-3 font-black text-[13px]">Tamil Message <input id="autoTamil" type="checkbox" class="w-5 h-5"></label></div><div class="flex gap-3 mt-4"><button onclick="closeAutoSettings()" class="flex-1 bg-gray-100 py-3.5 rounded-xl font-black border-2 border-black">Cancel</button><button onclick="saveAutoSettings()" class="flex-1 bg-[#0a5c26] text-white py-3.5 rounded-xl font-black border-2 border-black">Save</button></div></div></div>
+<div id="priceModal" class="hidden fixed inset-0 bg-black/70 z-[95] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5"><h3 class="font-black">⚙️ Price Settings</h3><div id="priceInputs" class="space-y-3 mt-4"></div><div class="flex gap-3 mt-4"><button onclick="closePriceSettings()" class="flex-1 bg-gray-100 py-3.5 rounded-xl font-black border-2 border-black">Cancel</button><button onclick="savePriceSettings()" class="flex-1 bg-[#0a5c26] text-white py-3.5 rounded-xl font-black border-2 border-black">Save Price ✅</button></div></div></div>
+<div id="priceHistModal" class="hidden fixed inset-0 bg-black/70 z-[95] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><div class="flex justify-between"><h3 class="font-black">📅 Price History</h3><button onclick="closePriceHistory()" class="font-black">X</button></div><div id="priceHistContent" class="mt-3"></div></div></div>
+<div id="dailyModal" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><div class="flex justify-between"><h3 class="font-black">📅 Daily Report</h3><button onclick="closeDaily()" class="font-black">X</button></div><div id="dailyContent" class="mt-3"></div></div></div>
+<div id="allReportModal" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center p-2"><div class="bg-white w-full max-w-md rounded-t-[28px] p-5 max-h-[92vh] overflow-y-auto"><div class="flex justify-between"><h3 class="font-black">📊 All Report</h3><button onclick="closeAllReport()" class="font-black">X</button></div><div id="allReportContent" class="mt-3"></div></div></div>
+<div id="autoPopup" class="hidden fixed inset-0 bg-black/70 z-[98] flex items-center justify-center p-4"><div class="bg-white w-full max-w-sm rounded-[24px] p-5 text-center border-2 border-black"><h3 id="autoPopupTitle" class="font-black">✅ Sale Saved!</h3><p id="autoPopupShop" class="text-[12px] font-bold text-gray-600"></p><div class="grid grid-cols-2 gap-2 mt-3"><button onclick="sendAutoEnglish()" class="bg-[#0a5c26] text-white py-3 rounded-xl font-black border-2 border-black text-[12px]">🇬🇧 English</button><button onclick="sendAutoTamil()" class="bg-[#ffde59] py-3 rounded-xl font-black border-2 border-black text-[12px]">🇱🇰 Tamil</button></div><button onclick="closeAutoPopup()" class="w-full bg-gray-100 py-3 rounded-xl font-black border-2 border-black mt-2 text-[12px]">Skip</button></div></div>
 
 <script>
-// ===== V22 - DATABASE + VARIABLES - KEY READY =====
 var firebaseConfig = { apiKey: "AIzaSyA-OQKxJeDhALnecWc2Jyv_mNxr3W6NFA8", authDomain: "eravur-egg.firebaseapp.com", projectId: "eravur-egg", storageBucket: "eravur-egg.firebasestorage.app", messagingSenderId: "721546852813", appId: "1:721546852813:web:91efbc2c7d5f36f4332c84" };
-var db = null;
-var shops = []; var tx = [];
-var rates = {30: 52, 36: 52, 40: 52, 45: 52};
-var priceHist = JSON.parse(localStorage.getItem('egg_priceHist')||'[]');
-var sizes = [30,36,40,45];
-var curShopId = null; var curTxId = null; var curEditTxId = null; var curInvoice = null; var curShareId = null; var curAutoData = null; var isSaleSaving = false; var curAreaFilter = 'ALL';
-var savedRates = JSON.parse(localStorage.getItem('egg_rates')||'null'); if(savedRates) rates = savedRates;
+var db=null, shops=[], tx=[];
+var sizes=[240,260,280,300];
+var rates={240:24,260:26,280:28,300:30};
+var priceHist=JSON.parse(localStorage.getItem('egg_priceHist')||'[]');
+var savedRates=JSON.parse(localStorage.getItem('egg_rates')||'null'); if(savedRates) rates=savedRates;
+var curShopId=null, curEditTxId=null, curInvoice=null, curShareId=null, curAutoData=null, isSaleSaving=false, isPaySaving=false, curAreaFilter='ALL', payMode='old';
+function fmt(n){ return 'Rs.'+(Math.round(Number(n)||0)).toLocaleString('en-LK'); }
+function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function dateStrOf(t){ if(t.dateStr) return t.dateStr; if(t.date){ try{ var d=new Date(t.date); if(!isNaN(d)) return d.toLocaleDateString('en-GB'); }catch(e){} } return t.date||''; }
+function txDateKey(t){ if(t.dateStr) return t.dateStr; if(t.date){ try{ return new Date(t.date).toISOString().slice(0,10); }catch(e){} } return ''; }
 function getAutoSettings(){ return JSON.parse(localStorage.getItem('egg_auto')||'{"sale":true,"pay":true,"tamil":false}'); }
 function saveRates(){ localStorage.setItem('egg_rates', JSON.stringify(rates)); }
-
-function initDB(){
-  try{
-    if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
-    setupListeners();
-    return true;
-  }catch(e){ console.log('DB Error', e); return false; }
-}
-// ===== DATABASE RESTORE BUTTON - DB ♻️ =====
-function restoreDatabase(){
-  var ok = initDB();
-  if(!ok || !db){ alert('DB Connect aagala da!\\nFirebase Key-a sariya pottiya nu paaru da!'); return; }
-  var el = document.getElementById('shopList');
-  if(el) el.innerHTML = '<div class="text-center py-10"><div class="text-[30px] animate-spin inline-block">◐</div><div class="font-black mt-2">DB Restore pannuren da...</div></div>';
-  setupListeners();
-  setTimeout(function(){ renderShops(); alert('DB Restored da! ✅\\nKadai: '+shops.length); }, 1500);
-}
-function setupListeners(){
-  if(!db) return;
-  db.collection('shops').onSnapshot(function(s){ shops = s.docs.map(function(d){ var o=d.data(); o.id=d.id; return o; }); renderShops(); });
-  db.collection('transactions').onSnapshot(function(s){ tx = s.docs.map(function(d){ var o=d.data(); o.id=d.id; return o; }); renderShops(); });
-}
+function initDB(){ try{ if(!firebase.apps.length) firebase.initializeApp(firebaseConfig); db=firebase.firestore(); setupListeners(); return true; }catch(e){ console.log(e); return false; } }
+function restoreDatabase(){ var ok=initDB(); if(!ok||!db){ alert('DB Connect aagala da!'); return; } setupListeners(); setTimeout(function(){ renderShops(); alert('DB Restored da! ✅\nKadai: '+shops.length); },1200); }
+function setupListeners(){ if(!db) return; db.collection('shops').onSnapshot(function(s){ shops=s.docs.map(function(d){ var o=d.data(); o.id=d.id; return o; }); renderShops(); }); db.collection('transactions').onSnapshot(function(s){ tx=s.docs.map(function(d){ var o=d.data(); o.id=d.id; return o; }); renderShops(); }); }
 function doLogin(){ var p=document.getElementById('loginPass').value; if(p==='1234'){ localStorage.setItem('egg_logged','yes'); document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('appContent').classList.remove('hidden'); initDB(); } else alert('Password thappu da! 1234'); }
 function doLogout(){ localStorage.removeItem('egg_logged'); location.reload(); }
 function printAreaById(id){ var el=document.getElementById(id); if(!el) return; var w=window.open('','','width=300,height=600'); w.document.write('<html><body>'+el.innerHTML+'</body></html>'); w.document.close(); setTimeout(function(){ w.print(); w.close(); },300); }
 window.addEventListener('load', function(){ if(localStorage.getItem('egg_logged')==='yes'){ document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('appContent').classList.remove('hidden'); initDB(); } });
-</script><script>
-// ===== V22 - HELPERS + SHOP LIST =====
-function fmt(n){ return 'Rs.' + (Math.round(Number(n)||0)).toLocaleString('en-LK'); }
-function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function getShopTx(id){ return tx.filter(function(t){ return t.shopId===id; }); }
+// ===== CORE - PALAYA KANAKU THAAN =====
 function calcShop(shop){
-  var list = getShopTx(shop.id);
-  var saleTotal = 0, paidTotal = 0;
-  list.forEach(function(t){ if(t.type==='sale') saleTotal += Number(t.total)||0; if(t.type==='pay') paidTotal += Number(t.amount)||0; });
-  var oldBal = Number(shop.oldBal)||0, oldPaid = Number(shop.oldPaid)||0;
-  var balance = oldBal - oldPaid + saleTotal - paidTotal;
-  return { saleTotal: saleTotal, paidTotal: paidTotal, balance: balance, list: list };
+  var list = tx.filter(function(t){ return t.shopId===shop.id; });
+  var saleTotal=0, paidTotal=0;
+  list.forEach(function(t){ if(t.type==='sale') saleTotal+=Number(t.total)||0; if(t.type==='pay'||t.type==='old_payment'||t.type==='sale_payment') paidTotal+=Number(t.amount)||0; });
+  // Palaya system shop.balance la ellam maintain pannuchu - athu thaan 100% correct
+  // Puthu V22 sale/pay um shop.balance-a update pannum, so shop.balance-a base-a edukkanum
+  var bal = (typeof shop.balance==='number') ? Number(shop.balance)||0 : (Number(shop.oldBalance ?? shop.oldBal ?? 0) - Number(shop.oldPaid||0) + saleTotal - paidTotal);
+  // Palaya kadai ku totalSale/totalPaid iruntha, display ku atha use pannu
+  return { saleTotal: Number(shop.totalSale ?? saleTotal)||0, paidTotal: Number(shop.totalPaid ?? paidTotal)||0, balance: bal, list: list, oldRem: (Number(shop.oldBalance ?? shop.oldBal ?? 0) - Number(shop.oldPaid||0)) };
 }
-function setAreaFilter(a){
-  curAreaFilter = a;
-  document.querySelectorAll('.area-filter-btn').forEach(function(b){ b.style.background = '#fff'; b.style.color = '#000'; });
-  var btn = document.getElementById('filter' + (a==='ALL' ? 'ALL' : a));
-  if(btn){ btn.style.background = '#ffde59'; }
-  renderShops();
-}
-function clearSearch(){ document.getElementById('search').value = ''; renderShops(); }
+function setAreaFilter(a){ curAreaFilter=a; document.querySelectorAll('.area-filter-btn').forEach(function(b){ b.style.background='#fff'; }); var btn=document.getElementById('filter'+a); if(btn) btn.style.background='#ffde59'; renderShops(); }
+function clearSearch(){ document.getElementById('search').value=''; renderShops(); }
 function renderShops(){
-  var el = document.getElementById('shopList'); if(!el) return;
-  var q = (document.getElementById('search').value||'').toLowerCase();
-  var filtered = shops.filter(function(s){
-    var okArea = curAreaFilter==='ALL' || s.area===curAreaFilter;
-    var okQ = !q || (s.name||'').toLowerCase().includes(q) || (s.phone||'').includes(q);
-    return okArea && okQ;
-  });
-  filtered.sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
-  var tot = 0; shops.forEach(function(s){ tot += calcShop(s).balance; });
-  document.getElementById('totBalance').innerText = fmt(tot);
-  document.getElementById('totCount').innerText = filtered.length + ' kadai';
-  if(filtered.length===0){
-    el.innerHTML = '<div class="bg-white rounded-[18px] border-2 border-black p-6 text-center"><div class="text-[30px]">🥚</div><div class="font-black mt-2">Kadai illa da!</div><div class="text-[11px] font-bold text-gray-500">+ கடை button-a aluththu pudhu kadai add pannu<br>DB kaanama pona DB ♻️ button-a aluththu</div></div>';
-    return;
-  }
-  var html = '';
-  filtered.forEach(function(s){
-    var c = calcShop(s);
-    var lastSale = ''; var last = c.list.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); })[0];
-    if(last) lastSale = last.date + ' • ' + (last.type==='sale' ? 'Sale' : 'Paid');
-    html += '<div class="bg-white rounded-[18px] border-2 border-black p-3"><div class="flex justify-between items-start"><div><div class="font-black text-[14px]">'+(s.name||'')+'</div><div class="text-[11px] font-bold text-gray-500">'+(s.area||'')+' • '+(s.phone||'')+'</div><div class="text-[10px] font-bold text-gray-400">'+lastSale+'</div></div><div class="text-right"><div class="text-[10px] font-bold text-gray-500">BALANCE</div><div class="font-black text-[15px] '+(c.balance>0?'text-red-600':'text-green-600')+'">'+fmt(c.balance)+'</div></div></div><div class="grid grid-cols-4 gap-1.5 mt-3"><button onclick="openSale(\''+s.id+'\')" class="bg-[#0a5c26] text-white py-2.5 rounded-lg font-black border-2 border-black text-[11px]">🥚<br>Sale</button><button onclick="openPay(\''+s.id+'\')" class="bg-[#ffde59] py-2.5 rounded-lg font-black border-2 border-black text-[11px]">💰<br>Pay</button><button onclick="openReport(\''+s.id+'\')" class="bg-blue-100 py-2.5 rounded-lg font-black border-2 border-black text-[11px]">📊<br>Report</button><button onclick="openEditShop(\''+s.id+'\')" class="bg-gray-100 py-2.5 rounded-lg font-black border-2 border-black text-[11px]">✏️<br>Edit</button></div></div>';
-  });
-  el.innerHTML = html;
+  var el=document.getElementById('shopList'); if(!el) return;
+  var q=(document.getElementById('search').value||'').toLowerCase();
+  var filtered=shops.filter(function(s){ var okA=curAreaFilter==='ALL'||s.area===curAreaFilter; var okQ=!q||(s.name||'').toLowerCase().includes(q)||(s.phone||'').includes(q); return okA&&okQ; });
+  filtered.sort(function(a,b){ return (Number(calcShop(b).balance)||0)-(Number(calcShop(a).balance)||0); });
+  var tot=0; shops.forEach(function(s){ tot+=calcShop(s).balance; });
+  document.getElementById('totBalance').innerText=fmt(tot);
+  document.getElementById('totCount').innerText=filtered.length+' kadai';
+  if(!filtered.length){ el.innerHTML='<div class="bg-white rounded-[18px] border-2 border-black p-6 text-center font-black">Kadai illa da! 🥚<br><span class="text-[11px] text-gray-500">DB ♻️ aluththu paaru</span></div>'; return; }
+  var html='';
+  filtered.forEach(function(s){ var c=calcShop(s); var last=c.list.slice().sort(function(a,b){ return String(b.date||'').localeCompare(String(a.date||'')); })[0]; var lastTxt=last?dateStrOf(last)+' • '+(last.type==='sale'?'Sale '+fmt(last.total):'Paid '+fmt(last.amount)):'No Sale';
+  html+='<div class="bg-white rounded-[22px] border-[3px] border-[#0a5c26] p-3"><div class="flex justify-between items-center"><span class="font-black text-[14px]">'+(s.name||'')+'</span><span class="text-[10px] bg-white border-2 border-black px-3 py-1 rounded-full font-black">'+(s.area||'')+'</span></div><div class="bg-[#fff5f5] border-[3px] border-red-600 rounded-[14px] p-3 text-center mt-2"><div class="text-[10px] font-black text-red-600">💰 TOTAL BALANCE</div><div class="font-black text-[22px] text-red-600">'+fmt(c.balance)+'</div><div class="text-[10px] font-bold text-gray-500">Old Rem: '+fmt(c.oldRem)+' • Last: '+lastTxt+'</div></div><div class="grid grid-cols-4 gap-1.5 mt-3"><button onclick="openSale(\''+s.id+'\')" class="bg-[#0a5c26] text-white py-2.5 rounded-lg font-black border-2 border-black text-[11px]">🥚<br>Sale</button><button onclick="openPay(\''+s.id+'\')" class="bg-[#ffde59] py-2.5 rounded-lg font-black border-2 border-black text-[11px]">💰<br>Pay</button><button onclick="openReport(\''+s.id+'\')" class="bg-blue-100 py-2.5 rounded-lg font-black border-2 border-black text-[11px]">📊<br>Report</button><button onclick="openEditShop(\''+s.id+'\')" class="bg-gray-100 py-2.5 rounded-lg font-black border-2 border-black text-[11px]">✏️<br>Edit</button></div></div>'; });
+  el.innerHTML=html;
 }
-// ===== ADD / EDIT SHOP =====
-function openAddShop(){ document.getElementById('newShopName').value=''; document.getElementById('newShopPhone').value=''; document.getElementById('newOldBal').value=0; document.getElementById('newOldPaid').value=0; document.getElementById('addShopModal').classList.remove('hidden'); }
+function openAddShop(){ document.getElementById('newShopName').value=''; document.getElementById('newShopPhone').value=''; document.getElementById('newOldBal').value=0; document.getElementById('addShopModal').classList.remove('hidden'); }
 function closeAddShop(){ document.getElementById('addShopModal').classList.add('hidden'); }
-function saveNewShop(){
-  var name = document.getElementById('newShopName').value.trim();
-  if(!name){ alert('Kadai peru podu da!'); return; }
-  if(!db){ alert('DB connect aagala da! DB ♻️ aluththu!'); return; }
-  db.collection('shops').add({ name: name, area: document.getElementById('newShopArea').value, phone: document.getElementById('newShopPhone').value.trim(), oldBal: Number(document.getElementById('newOldBal').value)||0, oldPaid: Number(document.getElementById('newOldPaid').value)||0, createdAt: new Date().toISOString() }).then(function(){ closeAddShop(); alert('Kadai Saved da! ✅'); });
-}
-function openEditShop(id){
-  var s = shops.find(function(x){ return x.id===id; }); if(!s) return; curShopId = id;
-  document.getElementById('editLabel').innerText = s.name + ' • ' + s.area;
-  document.getElementById('editName').value = s.name||''; document.getElementById('editArea').value = s.area||'Eravur'; document.getElementById('editPhone').value = s.phone||''; document.getElementById('editOldBal').value = s.oldBal||0; document.getElementById('editOldPaid').value = s.oldPaid||0;
-  calcEditShopLive();
-  document.getElementById('editShopModal').classList.remove('hidden');
-}
-function calcEditShopLive(){
-  var s = shops.find(function(x){ return x.id===curShopId; }); if(!s) return;
-  var oldBal = Number(document.getElementById('editOldBal').value)||0; var oldPaid = Number(document.getElementById('editOldPaid').value)||0;
-  var saleTotal = 0, paidTotal = 0; getShopTx(curShopId).forEach(function(t){ if(t.type==='sale') saleTotal += Number(t.total)||0; if(t.type==='pay') paidTotal += Number(t.amount)||0; });
-  var bal = oldBal - oldPaid + saleTotal - paidTotal;
-  document.getElementById('editShopLive').innerText = 'LIVE REM: ' + fmt(bal);
-}
+function saveNewShop(){ var name=document.getElementById('newShopName').value.trim(); if(!name){ alert('Kadai peru podu da!'); return; } var ob=Number(document.getElementById('newOldBal').value)||0; if(!db){ alert('DB connect aagala!'); return; } db.collection('shops').add({ name:name, area:document.getElementById('newShopArea').value, phone:document.getElementById('newShopPhone').value.trim(), oldBalance:ob, oldBal:ob, oldPaid:0, totalSale:0, totalPaid:0, balance:ob, createdAt:new Date().toISOString() }).then(function(){ closeAddShop(); alert('Kadai Saved da! ✅'); }); }
+function openEditShop(id){ var s=shops.find(function(x){ return x.id===id; }); if(!s) return; curShopId=id; document.getElementById('editLabel').innerText=s.name+' • '+s.area; document.getElementById('editName').value=s.name||''; document.getElementById('editArea').value=s.area||'Eravur'; document.getElementById('editPhone').value=s.phone||''; document.getElementById('editOldBal').value=s.oldBalance ?? s.oldBal ?? 0; document.getElementById('editOldPaid').value=s.oldPaid||0; calcEditShopLive(); document.getElementById('editShopModal').classList.remove('hidden'); }
+function calcEditShopLive(){ var s=shops.find(function(x){ return x.id===curShopId; }); if(!s) return; var ob=Number(document.getElementById('editOldBal').value)||0; var op=Number(document.getElementById('editOldPaid').value)||0; var oldRemOld=(Number(s.oldBalance ?? s.oldBal ?? 0)-Number(s.oldPaid||0)); var diff=(ob-op)-oldRemOld; document.getElementById('editShopLive').innerText='LIVE REM: '+fmt((Number(s.balance)||0)+diff)+' (Old Rem: '+fmt(ob-op)+')'; }
 function closeEditShop(){ document.getElementById('editShopModal').classList.add('hidden'); }
-function saveEditShop(){
-  var name = document.getElementById('editName').value.trim(); if(!name){ alert('Peru podu da!'); return; }
-  db.collection('shops').doc(curShopId).update({ name: name, area: document.getElementById('editArea').value, phone: document.getElementById('editPhone').value.trim(), oldBal: Number(document.getElementById('editOldBal').value)||0, oldPaid: Number(document.getElementById('editOldPaid').value)||0 }).then(function(){ closeEditShop(); alert('Updated da! ✅'); });
-}
-function deleteShop(){
-  if(!confirm('Itha kadaiya delete pannava da? Sale history-um pogum!')) return;
-  var list = getShopTx(curShopId);
-  var promises = list.map(function(t){ return db.collection('transactions').doc(t.id).delete(); });
-  Promise.all(promises).then(function(){ return db.collection('shops').doc(curShopId).delete(); }).then(function(){ closeEditShop(); alert('Deleted da!'); });
-}
-// ===== SALE =====
-function openSale(id){
-  var s = shops.find(function(x){ return x.id===id; }); if(!s) return; curShopId = id;
-  document.getElementById('saleShopName').innerText = s.name + ' • ' + s.area;
-  document.getElementById('saleDate').value = todayStr();
-  document.getElementById('salePaidNow').value = '';
-  var h = '';
-  sizes.forEach(function(sz){
-    h += '<div class="flex items-center gap-2"><div class="w-14 font-black text-[13px] bg-gray-100 rounded-lg py-3 text-center border-2 border-black">W'+sz+'</div><input id="saleQty'+sz+'" type="number" oninput="calcSale()" placeholder="Qty - Trays" class="flex-1 border-2 border-black rounded-xl p-3 font-bold"><div class="w-20 text-right font-black text-[12px]">Rs.'+(rates[sz]||0)+'/egg<br><span id="saleAmt'+sz+'" class="text-gray-500">Rs.0</span></div></div>';
-  });
-  document.getElementById('saleInputs').innerHTML = h;
-  calcSale();
-  document.getElementById('saleModal').classList.remove('hidden');
-}
-function calcSale(){
-  var s = shops.find(function(x){ return x.id===curShopId; }); if(!s) return;
-  var c = calcShop(s);
-  var eggs = 0, total = 0; var details = [];
-  sizes.forEach(function(sz){
-    var q = Number(document.getElementById('saleQty'+sz).value)||0;
-    var amt = q * sz * (rates[sz]||0); eggs += q*sz; total += amt;
-    var el = document.getElementById('saleAmt'+sz); if(el) el.innerText = 'Rs.' + amt.toLocaleString('en-LK');
-    if(q>0) details.push('W'+sz+': '+q+' tray ('+(q*sz)+' eggs) = Rs.'+amt.toLocaleString('en-LK'));
-  });
-  var paidNow = Number(document.getElementById('salePaidNow').value)||0;
-  var grand = c.balance + total - paidNow;
-  document.getElementById('saleEggs').innerText = eggs + ' eggs';
-  document.getElementById('saleToday').innerText = fmt(total);
-  document.getElementById('saleOldShow').innerText = fmt(c.balance);
-  document.getElementById('salePaidShow').innerText = fmt(paidNow);
-  document.getElementById('saleGrand').innerText = fmt(grand);
-  document.getElementById('saleDetails').innerText = details.join(' • ');
-}
-function setSalePaid(v){ document.getElementById('salePaidNow').value = v; calcSale(); }
-function setSalePaidFull(){
-  var s = shops.find(function(x){ return x.id===curShopId; }); if(!s) return;
-  var c = calcShop(s); var total = 0;
-  sizes.forEach(function(sz){ total += (Number(document.getElementById('saleQty'+sz).value)||0) * sz * (rates[sz]||0); });
-  document.getElementById('salePaidNow').value = c.balance + total; calcSale();
-}
+function saveEditShop(){ var s=shops.find(function(x){ return x.id===curShopId; }); var name=document.getElementById('editName').value.trim(); if(!name){ alert('Peru podu da!'); return; } var ob=Number(document.getElementById('editOldBal').value)||0; var op=Number(document.getElementById('editOldPaid').value)||0; var diff=(ob-op)-((Number(s.oldBalance ?? s.oldBal ?? 0)-Number(s.oldPaid||0))); db.collection('shops').doc(curShopId).update({ name:name, area:document.getElementById('editArea').value, phone:document.getElementById('editPhone').value.trim(), oldBalance:ob, oldBal:ob, oldPaid:op, balance:(Number(s.balance)||0)+diff }).then(function(){ closeEditShop(); alert('Updated da! ✅'); }); }
+function deleteShop(){ if(!confirm('Kadaiya delete pannava da? History-um pogum!')) return; var list=tx.filter(function(t){ return t.shopId===curShopId; }); Promise.all(list.map(function(t){ return db.collection('transactions').doc(t.id).delete(); })).then(function(){ return db.collection('shops').doc(curShopId).delete(); }).then(function(){ closeEditShop(); alert('Deleted da!'); }); }
+function saleQtyFor(sz){ var el=document.getElementById('qs'+sz); return el?Number(el.value)||0:0; }
+function openSale(id){ var s=shops.find(function(x){ return x.id===id; }); if(!s) return; curShopId=id; document.getElementById('saleShopName').innerText=s.name+' • '+s.area; document.getElementById('saleDate').value=todayStr(); document.getElementById('salePaidNow').value=''; var h=''; sizes.forEach(function(sz){ h+='<div class="flex items-center gap-2"><div class="w-16 font-black text-[13px] bg-gray-100 rounded-lg py-3 text-center border-2 border-black">'+sz+'</div><input id="qs'+sz+'" type="number" oninput="calcSale()" placeholder="Qty - Trays" class="flex-1 border-2 border-black rounded-xl p-3 font-bold"><div class="w-20 text-right font-black text-[12px]">Rs.'+(rates[sz]||0)+'/egg<br><span id="amt'+sz+'" class="text-gray-500">Rs.0</span></div></div>'; }); document.getElementById('saleInputs').innerHTML=h; calcSale(); document.getElementById('saleModal').classList.remove('hidden'); }
+function calcSale(){ var s=shops.find(function(x){ return x.id===curShopId; }); if(!s) return {today:0,grand:0,paid:0}; var today=0, eggs=0, det=[], qtys={}, ratesObj={}; sizes.forEach(function(sz){ var q=saleQtyFor(sz); var r=Number(rates[sz])||0; ratesObj[sz]=r; var amt=sz*q*r; today+=amt; eggs+=sz*q; qtys[sz]=q; var ae=document.getElementById('amt'+sz); if(ae) ae.innerText='Rs.'+amt.toLocaleString('en-LK'); if(q>0) det.push(sz+'*'+q+'*'+r+'='+amt.toLocaleString('en-LK')); }); var paidNow=Number(document.getElementById('salePaidNow').value)||0; var oldBal=calcShop(s).balance; var grand=Math.max(0, oldBal+today-paidNow); document.getElementById('saleToday').innerText=fmt(today); document.getElementById('saleOldShow').innerText=fmt(oldBal); document.getElementById('salePaidShow').innerText=fmt(paidNow); document.getElementById('saleEggs').innerText=eggs+' eggs'; document.getElementById('saleGrand').innerText=fmt(grand); document.getElementById('saleDetails').innerText=det.join(' | ')||'No eggs'; return {today:today, grand:grand, eggs:eggs, det:det, qtys:qtys, rates:ratesObj, paid:paidNow, oldBal:oldBal}; }
+function setSalePaid(v){ document.getElementById('salePaidNow').value=v; calcSale(); }
+function setSalePaidHalf(){ var c=calcSale(); document.getElementById('salePaidNow').value=Math.round((c.oldBal+c.today)/2); calcSale(); }
+function setSalePaidFull(){ var c=calcSale(); document.getElementById('salePaidNow').value=c.oldBal+c.today; calcSale(); }
 function closeSale(){ document.getElementById('saleModal').classList.add('hidden'); }
-function confirmSale(){
-  if(isSaleSaving) return; isSaleSaving = true;
-  var s = shops.find(function(x){ return x.id===curShopId; }); if(!s){ isSaleSaving=false; return; }
-  var date = document.getElementById('saleDate').value || todayStr();
-  var items = []; var total = 0; var eggs = 0;
-  sizes.forEach(function(sz){ var q = Number(document.getElementById('saleQty'+sz).value)||0; if(q>0){ var amt = q*sz*(rates[sz]||0); items.push({size:sz, qty:q, eggs:q*sz, rate:rates[sz]||0, amt:amt}); total += amt; eggs += q*sz; } });
-  if(items.length===0){ alert('Qty podu da!'); isSaleSaving=false; return; }
-  var paidNow = Number(document.getElementById('salePaidNow').value)||0;
-  var c = calcShop(s);
-  db.collection('transactions').add({ shopId: curShopId, type:'sale', date: date, items: items, total: total, eggs: eggs, paid: paidNow, createdAt: new Date().toISOString() }).then(function(docRef){
-    if(paidNow>0){ return db.collection('transactions').add({ shopId: curShopId, type:'pay', date: date, amount: paidNow, note:'Sale Paid', createdAt: new Date().toISOString() }).then(function(){ return docRef; }); }
-    return docRef;
-  }).then(function(docRef){
-    isSaleSaving = false; closeSale();
-    curInvoice = { id: docRef.id, shop: s, date: date, items: items, total: total, oldBal: c.balance, paid: paidNow, balance: c.balance + total - paidNow, eggs: eggs };
-    showInvoice();
-    var auto = getAutoSettings();
-    if(auto.sale){ curAutoData = { shop: s, date: date, items: items, total: total, oldBal: c.balance, paid: paidNow, balance: c.balance + total - paidNow, eggs: eggs }; showAutoPopup('✅ Sale Saved!', s.name); }
-  }).catch(function(e){ isSaleSaving=false; alert('Error da: '+e.message); });
-}
-// ===== PAY =====
-function openPay(id){
-  var s = shops.find(function(x){ return x.id===id; }); if(!s) return; curShopId = id;
-  document.getElementById('payShopName').innerText = s.name + ' • ' + s.area;
-  document.getElementById('payBalance').innerText = fmt(calcShop(s).balance);
-  document.getElementById('payDate').value = todayStr(); document.getElementById('payAmount').value = '';
-  document.getElementById('payModal').classList.remove('hidden');
-}
-function setPayHalf(){ var s = shops.find(function(x){ return x.id===curShopId; }); if(s) document.getElementById('payAmount').value = Math.round(calcShop(s).balance/2); }
-function setPayFull(){ var s = shops.find(function(x){ return x.id===curShopId; }); if(s) document.getElementById('payAmount').value = calcShop(s).balance; }
+function confirmSale(){ if(isSaleSaving) return; var c=calcSale(); if(c.today===0){ alert('Qty podu da!'); return; } isSaleSaving=true; var btn=document.getElementById('saveSaleBtn'); btn.innerText='Saving...'; var s=shops.find(function(x){ return x.id===curShopId; }); var d=document.getElementById('saleDate').value; var dateObj=d?new Date(d):new Date(); var oldBalBefore=c.oldBal; db.collection('shops').doc(s.id).update({ balance:c.grand, totalSale:(Number(s.totalSale)||0)+c.today, totalPaid:(Number(s.totalPaid)||0)+c.paid }).then(function(){ return db.collection('transactions').add({ shopId:s.id, shopName:s.name, area:s.area, type:'sale', total:c.today, balance:c.grand, eggs:c.eggs, details:c.det.join(', '), qtys:c.qtys, rates:c.rates, paidNow:c.paid||0, paid:c.paid||0, date:dateObj.toISOString(), dateStr:dateObj.toLocaleDateString('en-GB') }); }).then(function(ref){ if(c.paid>0){ return db.collection('transactions').add({ shopId:s.id, shopName:s.name, area:s.area, type:'sale_payment', amount:c.paid, balance:c.grand, date:dateObj.toISOString(), dateStr:dateObj.toLocaleDateString('en-GB'), fromSale:true, forSaleId:ref.id }).then(function(){ return ref; }); } return ref; }).then(function(ref){ isSaleSaving=false; btn.innerText='Save Sale + Invoice 🧾'; closeSale(); curInvoice={ id:ref.id, shop:s, date:dateObj.toLocaleDateString('en-GB'), items:sizes.filter(function(sz){ return c.qtys[sz]>0; }).map(function(sz){ return {size:sz, qty:c.qtys[sz], rate:c.rates[sz], amt:c.qtys[sz]*sz*c.rates[sz]}; }), total:c.today, oldBal:oldBalBefore, paid:c.paid, balance:c.grand, eggs:c.eggs }; showInvoice(); var a=getAutoSettings(); if(a.sale){ curAutoData={ shop:s, date:dateObj.toLocaleDateString('en-GB'), items:curInvoice.items, total:c.today, oldBal:oldBalBefore, paid:c.paid, balance:c.grand, eggs:c.eggs }; showAutoPopup('✅ Sale Saved!', s.name); } }).catch(function(e){ isSaleSaving=false; btn.innerText='Save Sale + Invoice 🧾'; alert(e.message); }); }
+function openPay(id){ var s=shops.find(function(x){ return x.id===id; }); if(!s) return; curShopId=id; payMode='old'; document.getElementById('payShopName').innerText=s.name+' - Paid'; document.getElementById('payBalance').innerText=fmt(calcShop(s).balance); document.getElementById('payDate').value=todayStr(); document.getElementById('payAmount').value=''; document.getElementById('payLiveRemain').innerText=''; document.getElementById('payInputArea').classList.add('hidden'); document.getElementById('payModal').classList.remove('hidden'); }
+function selectPayMode(mode){ payMode=mode; document.getElementById('payDate').value=todayStr(); document.getElementById('payAmount').value=''; document.getElementById('payLiveRemain').innerText=''; document.getElementById('payInputArea').classList.remove('hidden'); document.getElementById('selectedLabel').innerText=mode==='old'?'🧾 Old Pay':'💵 Sale Pay'; }
+function calcPayLive(){ var amt=Number(document.getElementById('payAmount').value)||0; var s=shops.find(function(x){ return x.id===curShopId; }); if(s) document.getElementById('payLiveRemain').innerText='REMAIN: '+fmt((Number(s.balance)||0)-amt); }
+function setPayHalf(){ var s=shops.find(function(x){ return x.id===curShopId; }); if(s){ document.getElementById('payAmount').value=Math.round((Number(s.balance)||0)/2); calcPayLive(); } }
+function setPayFull(){ var s=shops.find(function(x){ return x.id===curShopId; }); if(s){ document.getElementById('payAmount').value=Number(s.balance)||0; calcPayLive(); } }
 function closePay(){ document.getElementById('payModal').classList.add('hidden'); }
-function confirmPay(){
-  var amt = Number(document.getElementById('payAmount').value)||0; if(amt<=0){ alert('Amount podu da!'); return; }
-  var date = document.getElementById('payDate').value || todayStr();
-  var s = shops.find(function(x){ return x.id===curShopId; });
-  db.collection('transactions').add({ shopId: curShopId, type:'pay', date: date, amount: amt, createdAt: new Date().toISOString() }).then(function(){
-    closePay();
-    var auto = getAutoSettings();
-    if(auto.pay){ curAutoData = { shop: s, date: date, paid: amt, balance: calcShop(s).balance - amt, isPay: true }; showAutoPopup('✅ Paid Saved!', s.name); }
-    else alert('Paid Saved da! ✅');
-  });
-}
-</script><script>
-// ===== V22 - REPORT =====
-function openReport(id){
-  var s = shops.find(function(x){ return x.id===id; }); if(!s) return; curShopId = id;
-  var c = calcShop(s);
-  var list = c.list.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||'') || (b.createdAt||'').localeCompare(a.createdAt||''); });
-  var h = '<div class="bg-green-50 border-2 border-black rounded-xl p-3"><div class="font-black text-[15px]">'+s.name+'</div><div class="text-[11px] font-bold text-gray-600">'+s.area+' • '+(s.phone||'')+'</div><div class="flex justify-between mt-2"><span class="text-[11px] font-bold">Total Sale</span><span class="font-black text-[12px]">'+fmt(c.saleTotal)+'</span></div><div class="flex justify-between"><span class="text-[11px] font-bold">Total Paid</span><span class="font-black text-[12px] text-green-600">'+fmt(c.paidTotal + (Number(s.oldPaid)||0))+'</span></div><div class="flex justify-between mt-1 pt-1 border-t-2 border-black"><span class="font-black">Balance</span><span class="font-black text-red-600">'+fmt(c.balance)+'</span></div></div>';
-  h += '<div class="flex gap-2 mt-3"><button onclick="openShare(\''+s.id+'\')" class="flex-1 bg-[#0a5c26] text-white py-3 rounded-xl font-black border-2 border-black text-[12px]">📤 Share Bill</button><button onclick="openSale(\''+s.id+'\')" class="flex-1 bg-[#ffde59] py-3 rounded-xl font-black border-2 border-black text-[12px]">🥚 New Sale</button></div>';
-  h += '<h4 class="font-black text-[12px] mt-4 mb-2">History - '+list.length+'</h4>';
-  if(list.length===0) h += '<p class="text-[11px] font-bold text-gray-500 text-center py-4">History illa da!</p>';
-  list.forEach(function(t){
-    if(t.type==='sale'){
-      var det = (t.items||[]).map(function(i){ return 'W'+i.size+': '+i.qty; }).join(' • ');
-      h += '<div class="bg-white border-2 border-black rounded-xl p-3 mb-2"><div class="flex justify-between"><span class="font-black text-[12px]">🥚 Sale • '+t.date+'</span><span class="font-black text-[12px]">'+fmt(t.total)+'</span></div><div class="text-[11px] font-bold text-gray-600">'+det+' • '+(t.eggs||0)+' eggs • Paid: '+fmt(t.paid||0)+'</div><div class="flex gap-2 mt-2"><button onclick="openEditSaleTx(\''+t.id+'\')" class="flex-1 bg-gray-100 py-2 rounded-lg font-black border-2 border-black text-[11px]">✏️ Edit</button><button onclick="openInvoiceFromTx(\''+t.id+'\')" class="flex-1 bg-yellow-100 py-2 rounded-lg font-black border-2 border-black text-[11px]">🧾 Bill</button></div></div>';
-    } else {
-      h += '<div class="bg-green-50 border-2 border-black rounded-xl p-3 mb-2"><div class="flex justify-between"><span class="font-black text-[12px]">💰 Paid • '+t.date+'</span><span class="font-black text-[12px] text-green-600">'+fmt(t.amount)+'</span></div><div class="flex gap-2 mt-2"><button onclick="openEditPayTx(\''+t.id+'\')" class="flex-1 bg-gray-100 py-2 rounded-lg font-black border-2 border-black text-[11px]">✏️ Edit</button></div></div>';
-    }
-  });
-  document.getElementById('reportContent').innerHTML = h;
-  document.getElementById('reportModal').classList.remove('hidden');
-}
+function confirmPay(){ if(isPaySaving) return; var amt=Number(document.getElementById('payAmount').value)||0; if(!amt){ alert('Amount podu da!'); return; } isPaySaving=true; var s=shops.find(function(x){ return x.id===curShopId; }); var d=document.getElementById('payDate').value; var dateObj=d?new Date(d):new Date(); var beforeBal=Number(s.balance)||0; var newBal=beforeBal-amt; var newTotalPaid=(Number(s.totalPaid)||0)+amt; var newOldPaid=Number(s.oldPaid)||0; if(payMode==='old'){ var oldRem=(Number(s.oldBalance ?? s.oldBal ?? 0)-Number(s.oldPaid||0)); if(amt>oldRem) newOldPaid=Number(s.oldBalance ?? s.oldBal ?? 0); else newOldPaid+=amt; } var lastSale=tx.filter(function(t){ return t.shopId===s.id&&t.type==='sale'; })[0]; db.collection('transactions').add({ shopId:s.id, shopName:s.name, area:s.area, type:payMode==='old'?'old_payment':'sale_payment', amount:amt, balance:newBal, date:dateObj.toISOString(), dateStr:dateObj.toLocaleDateString('en-GB'), forSaleId:lastSale?lastSale.id:null }).then(function(){ return db.collection('shops').doc(s.id).update({ balance:newBal, totalPaid:newTotalPaid, oldPaid:newOldPaid }); }).then(function(){ isPaySaving=false; closePay(); var a=getAutoSettings(); if(a.pay){ curAutoData={ shop:s, date:dateObj.toLocaleDateString('en-GB'), paid:amt, balance:newBal, isPay:true }; showAutoPopup('✅ Paid Saved!', s.name); } else alert('Paid Saved da! ✅'); }).catch(function(e){ isPaySaving=false; alert(e.message); }); }
+function openReport(id){ var s=shops.find(function(x){ return x.id===id; }); if(!s) return; curShopId=id; var c=calcShop(s); var list=c.list.slice().sort(function(a,b){ return String(b.date||'').localeCompare(String(a.date||'')); }); var h='<div class="bg-green-50 border-2 border-black rounded-xl p-3"><div class="font-black">'+s.name+'</div><div class="text-[11px] font-bold text-gray-600">'+s.area+' • '+(s.phone||'')+'</div><div class="flex justify-between mt-2 text-[12px] font-bold"><span>Old Rem</span><span>'+fmt(c.oldRem)+'</span></div><div class="flex justify-between text-[12px] font-bold"><span>Total Sale</span><span>'+fmt(c.saleTotal)+'</span></div><div class="flex justify-between text-[12px] font-bold"><span>Total Paid</span><span class="text-green-600">'+fmt(c.paidTotal)+'</span></div><div class="flex justify-between mt-1 pt-1 border-t-2 border-black font-black"><span>Balance</span><span class="text-red-600">'+fmt(c.balance)+'</span></div></div><div class="flex gap-2 mt-3"><button onclick="openShare(\''+s.id+'\')" class="flex-1 bg-[#0a5c26] text-white py-3 rounded-xl font-black border-2 border-black text-[12px]">📤 Share</button><button onclick="openSale(\''+s.id+'\')" class="flex-1 bg-[#ffde59] py-3 rounded-xl font-black border-2 border-black text-[12px]">🥚 New Sale</button></div><h4 class="font-black text-[12px] mt-4 mb-2">History - '+list.length+'</h4>'; if(!list.length) h+='<p class="text-center text-[11px] font-bold text-gray-500 py-4">History illa da!</p>'; list.forEach(function(t){ if(t.type==='sale'){ h+='<div class="bg-white border-2 border-black rounded-xl p-3 mb-2"><div class="flex justify-between"><span class="font-black text-[12px]">🥚 Sale • '+dateStrOf(t)+'</span><span class="font-black text-[12px]">'+fmt(t.total)+'</span></div><div class="text-[11px] font-bold text-gray-600">'+(t.details||'')+' • '+(t.eggs||0)+' eggs • Paid: '+fmt(t.paidNow ?? t.paid ?? 0)+'</div><div class="flex gap-2 mt-2"><button onclick="openEditSaleTx(\''+t.id+'\')" class="flex-1 bg-gray-100 py-2 rounded-lg font-black border-2 border-black text-[11px]">✏️ Edit</button><button onclick="openInvoiceFromTx(\''+t.id+'\')" class="flex-1 bg-yellow-100 py-2 rounded-lg font-black border-2 border-black text-[11px]">🧾 Bill</button></div></div>'; } else { h+='<div class="bg-blue-50 border-2 border-black rounded-xl p-3 mb-2"><div class="flex justify-between"><span class="font-black text-[12px]">💰 Paid • '+dateStrOf(t)+'</span><span class="font-black text-[12px] text-green-600">'+fmt(t.amount)+'</span></div><div class="text-[11px] font-bold text-gray-600">'+t.type+'</div><div class="flex gap-2 mt-2"><button onclick="openEditPayTx(\''+t.id+'\')" class="flex-1 bg-gray-100 py-2 rounded-lg font-black border-2 border-black text-[11px]">✏️ Edit</button></div></div>'; } }); document.getElementById('reportContent').innerHTML=h; document.getElementById('reportModal').classList.remove('hidden'); }
 function closeReport(){ document.getElementById('reportModal').classList.add('hidden'); }
-// ===== EDIT SALE TX =====
-function openEditSaleTx(tid){
-  var t = tx.find(function(x){ return x.id===tid; }); if(!t) return; curEditTxId = tid;
-  var s = shops.find(function(x){ return x.id===t.shopId; });
-  document.getElementById('editSaleTxInfo').innerText = (s?s.name:'') + ' • ' + t.date + ' • Old Total: ' + fmt(t.total);
-  document.getElementById('editSaleTxDate').value = t.date || todayStr();
-  var h = '';
-  sizes.forEach(function(sz){
-    var old = 0; (t.items||[]).forEach(function(i){ if(i.size===sz) old = i.qty; });
-    h += '<div class="flex items-center gap-2"><div class="w-14 font-black text-[13px] bg-gray-100 rounded-lg py-3 text-center border-2 border-black">W'+sz+'</div><input id="editSaleQty'+sz+'" type="number" value="'+old+'" oninput="calcEditSaleTx()" class="flex-1 border-2 border-black rounded-xl p-3 font-bold"><div class="w-20 text-right font-black text-[12px]">Rs.'+(rates[sz]||0)+'/egg</div></div>';
-  });
-  document.getElementById('editSaleTxInputs').innerHTML = h;
-  calcEditSaleTx();
-  document.getElementById('editSaleTxModal').classList.remove('hidden');
-}
-function calcEditSaleTx(){
-  var t = tx.find(function(x){ return x.id===curEditTxId; }); if(!t) return;
-  var total = 0, eggs = 0;
-  sizes.forEach(function(sz){ var q = Number(document.getElementById('editSaleQty'+sz).value)||0; total += q*sz*(rates[sz]||0); eggs += q*sz; });
-  document.getElementById('editSaleTxEggs').innerText = eggs + ' eggs';
-  document.getElementById('editSaleTxToday').innerText = fmt(total);
-  document.getElementById('editSaleTxOldTotal').innerText = fmt(t.total);
-  document.getElementById('editSaleTxDiff').innerText = fmt(total - (Number(t.total)||0));
-}
+function openEditSaleTx(tid){ var t=tx.find(function(x){ return x.id===tid; }); if(!t) return; curEditTxId=tid; var s=shops.find(function(x){ return x.id===t.shopId; }); document.getElementById('editSaleTxInfo').innerText=(s?s.name:'')+' • '+dateStrOf(t)+' • Old: '+fmt(t.total); document.getElementById('editSaleTxDate').value=t.date?new Date(t.date).toISOString().slice(0,10):todayStr(); var h=''; sizes.forEach(function(sz){ var oldQ=(t.qtys&&t.qtys[sz])||0; if(!oldQ && t.items){ t.items.forEach(function(i){ if(i.size===sz) oldQ=i.qty; }); } h+='<div class="flex items-center gap-2"><div class="w-16 font-black text-[13px] bg-gray-100 rounded-lg py-3 text-center border-2 border-black">'+sz+'</div><input id="editSaleQty'+sz+'" type="number" value="'+oldQ+'" oninput="calcEditSaleTx()" class="flex-1 border-2 border-black rounded-xl p-3 font-bold"><div class="w-20 text-right font-black text-[12px]">Rs.'+(rates[sz]||0)+'/egg</div></div>'; }); document.getElementById('editSaleTxInputs').innerHTML=h; calcEditSaleTx(); document.getElementById('editSaleTxModal').classList.remove('hidden'); }
+function calcEditSaleTx(){ var t=tx.find(function(x){ return x.id===curEditTxId; }); if(!t) return {today:0}; var total=0, eggs=0, qtys={}, ratesObj={}; sizes.forEach(function(sz){ var q=Number(document.getElementById('editSaleQty'+sz).value)||0; qtys[sz]=q; ratesObj[sz]=rates[sz]||0; total+=q*sz*(rates[sz]||0); eggs+=q*sz; }); document.getElementById('editSaleTxEggs').innerText=eggs+' eggs'; document.getElementById('editSaleTxToday').innerText=fmt(total); document.getElementById('editSaleTxOldTotal').innerText=fmt(t.total); document.getElementById('editSaleTxDiff').innerText=fmt(total-Number(t.total||0)); return {today:total, eggs:eggs, qtys:qtys, rates:ratesObj}; }
 function closeEditSaleTx(){ document.getElementById('editSaleTxModal').classList.add('hidden'); }
-function saveEditSaleTx(){
-  var t = tx.find(function(x){ return x.id===curEditTxId; }); if(!t) return;
-  var items = []; var total = 0; var eggs = 0;
-  sizes.forEach(function(sz){ var q = Number(document.getElementById('editSaleQty'+sz).value)||0; if(q>0){ var amt = q*sz*(rates[sz]||0); items.push({size:sz, qty:q, eggs:q*sz, rate:rates[sz]||0, amt:amt}); total += amt; eggs += q*sz; } });
-  if(items.length===0){ alert('Qty podu da!'); return; }
-  db.collection('transactions').doc(curEditTxId).update({ date: document.getElementById('editSaleTxDate').value || t.date, items: items, total: total, eggs: eggs }).then(function(){ closeEditSaleTx(); alert('Sale Updated da! ✅'); openReport(t.shopId); });
-}
-function deleteEditSaleTx(){
-  if(!confirm('Itha sale-a delete pannava da?')) return;
-  var t = tx.find(function(x){ return x.id===curEditTxId; });
-  db.collection('transactions').doc(curEditTxId).delete().then(function(){ closeEditSaleTx(); alert('Deleted da!'); if(t) openReport(t.shopId); });
-}
-// ===== EDIT PAY TX =====
-function openEditPayTx(tid){
-  var t = tx.find(function(x){ return x.id===tid; }); if(!t) return; curEditTxId = tid;
-  var s = shops.find(function(x){ return x.id===t.shopId; });
-  document.getElementById('editPayTxInfo').innerText = (s?s.name:'') + ' • ' + t.date + ' • Old Paid: ' + fmt(t.amount);
-  document.getElementById('editPayTxDate').value = t.date || todayStr();
-  document.getElementById('editPayTxAmount').value = t.amount||0;
-  calcEditPayTxLive();
-  document.getElementById('editPayTxModal').classList.remove('hidden');
-}
-function calcEditPayTxLive(){
-  var t = tx.find(function(x){ return x.id===curEditTxId; }); if(!t) return;
-  var s = shops.find(function(x){ return x.id===t.shopId; }); if(!s) return;
-  var newAmt = Number(document.getElementById('editPayTxAmount').value)||0;
-  var c = calcShop(s);
-  var newBal = c.balance - (Number(t.amount)||0) + 0; // dummy to avoid confusion
-  newBal = c.balance + (Number(t.amount)||0) - newAmt;
-  document.getElementById('editPayTxLive').innerText = 'New Balance: ' + fmt(newBal);
-}
+function saveEditSaleTx(){ var c=calcEditSaleTx(); var t=tx.find(function(x){ return x.id===curEditTxId; }); var s=shops.find(function(x){ return x.id===t.shopId; }); var diff=c.today-Number(t.total||0); var det=sizes.map(function(sz){ if(c.qtys[sz]>0) return sz+'*'+c.qtys[sz]+'*'+c.rates[sz]+'='+(sz*c.qtys[sz]*c.rates[sz]).toLocaleString('en-LK'); return null; }).filter(Boolean).join(', '); var d=document.getElementById('editSaleTxDate').value; var dateObj=d?new Date(d):new Date(t.date); db.collection('shops').doc(s.id).update({ balance:(Number(s.balance)||0)+diff, totalSale:(Number(s.totalSale)||0)+diff }).then(function(){ return db.collection('transactions').doc(t.id).update({ total:c.today, eggs:c.eggs, qtys:c.qtys, rates:c.rates, details:det, date:dateObj.toISOString(), dateStr:dateObj.toLocaleDateString('en-GB') }); }).then(function(){ closeEditSaleTx(); alert('Sale Updated da! ✅'); openReport(s.id); }); }
+function deleteEditSaleTx(){ if(!confirm('Sale-a delete pannava da?')) return; var t=tx.find(function(x){ return x.id===curEditTxId; }); var s=shops.find(function(x){ return x.id===t.shopId; }); db.collection('shops').doc(s.id).update({ balance:(Number(s.balance)||0)-Number(t.total||0), totalSale:(Number(s.totalSale)||0)-Number(t.total||0) }).then(function(){ return db.collection('transactions').doc(t.id).delete(); }).then(function(){ closeEditSaleTx(); closeReport(); alert('Deleted da!'); }); }
+function openEditPayTx(tid){ var t=tx.find(function(x){ return x.id===tid; }); if(!t) return; curEditTxId=tid; var s=shops.find(function(x){ return x.id===t.shopId; }); document.getElementById('editPayTxInfo').innerText=(s?s.name:'')+' • '+dateStrOf(t)+' • Old Paid: '+fmt(t.amount); document.getElementById('editPayTxDate').value=t.date?new Date(t.date).toISOString().slice(0,10):todayStr(); document.getElementById('editPayTxAmount').value=t.amount||0; calcEditPayTxLive(); document.getElementById('editPayTxModal').classList.remove('hidden'); }
+function calcEditPayTxLive(){ var t=tx.find(function(x){ return x.id===curEditTxId; }); if(!t) return; var s=shops.find(function(x){ return x.id===t.shopId; }); var newAmt=Number(document.getElementById('editPayTxAmount').value)||0; document.getElementById('editPayTxLive').innerText='New Balance: '+fmt((Number(s.balance)||0)+Number(t.amount||0)-newAmt); }
 function closeEditPayTx(){ document.getElementById('editPayTxModal').classList.add('hidden'); }
-function saveEditPayTx(){
-  var t = tx.find(function(x){ return x.id===curEditTxId; }); if(!t) return;
-  var amt = Number(document.getElementById('editPayTxAmount').value)||0; if(amt<0){ alert('Amount thappu da!'); return; }
-  db.collection('transactions').doc(curEditTxId).update({ date: document.getElementById('editPayTxDate').value || t.date, amount: amt }).then(function(){ closeEditPayTx(); alert('Paid Updated da! ✅'); openReport(t.shopId); });
-}
-function deleteEditPayTx(){
-  if(!confirm('Itha paid-a delete pannava da?')) return;
-  var t = tx.find(function(x){ return x.id===curEditTxId; });
-  db.collection('transactions').doc(curEditTxId).delete().then(function(){ closeEditPayTx(); alert('Deleted da!'); if(t) openReport(t.shopId); });
-}
-// ===== SHARE / INVOICE =====
-function buildShareText(shop, lang){
-  var c = calcShop(shop);
-  var last = c.list.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); })[0];
-  if(lang==='tamil'){
-    return '🥚 ERAVUR EGG CENTRE\n' + shop.name + ' - ' + shop.area + '\n----------------\nOld Balance: ' + fmt(c.balance) + '\n' + (last ? 'Last: ' + last.date + ' • ' + (last.type==='sale' ? 'Sale '+fmt(last.total) : 'Paid '+fmt(last.amount)) : '') + '\n----------------\nTotal Balance: ' + fmt(c.balance) + '\nNandri! 🙏';
-  }
-  return '🥚 ERAVUR EGG CENTRE\n' + shop.name + ' - ' + shop.area + '\n----------------\nTotal Balance: ' + fmt(c.balance) + '\n' + (last ? 'Last: ' + last.date + ' • ' + (last.type==='sale' ? 'Sale '+fmt(last.total) : 'Paid '+fmt(last.amount)) : '') + '\n----------------\nPlease Pay On Time. Thank You! 🙏';
-}
-function openShare(id){
-  var s = shops.find(function(x){ return x.id===id; }); if(!s) return; curShareId = id;
-  document.getElementById('shareShopName').innerText = s.name + ' • Balance: ' + fmt(calcShop(s).balance);
-  document.getElementById('sharePreview').innerText = buildShareText(s, 'english');
-  document.getElementById('shareModal').classList.remove('hidden');
-}
+function saveEditPayTx(){ var t=tx.find(function(x){ return x.id===curEditTxId; }); var s=shops.find(function(x){ return x.id===t.shopId; }); var newAmt=Number(document.getElementById('editPayTxAmount').value)||0; var diff=newAmt-Number(t.amount||0); var newBal=(Number(s.balance)||0)-diff; var newTotalPaid=(Number(s.totalPaid)||0)+diff; var newOldPaid=Number(s.oldPaid)||0; if(t.type==='old_payment') newOldPaid+=diff; var d=document.getElementById('editPayTxDate').value; var dateObj=d?new Date(d):new Date(t.date); db.collection('shops').doc(s.id).update({ balance:newBal, totalPaid:newTotalPaid, oldPaid:newOldPaid }).then(function(){ return db.collection('transactions').doc(t.id).update({ amount:newAmt, date:dateObj.toISOString(), dateStr:dateObj.toLocaleDateString('en-GB') }); }).then(function(){ closeEditPayTx(); alert('Paid Updated da! ✅'); openReport(s.id); }); }
+function deleteEditPayTx(){ if(!confirm('Paid-a delete pannava da?')) return; var t=tx.find(function(x){ return x.id===curEditTxId; }); var s=shops.find(function(x){ return x.id===t.shopId; }); var newBal=(Number(s.balance)||0)+Number(t.amount||0); var newTotalPaid=(Number(s.totalPaid)||0)-Number(t.amount||0); var newOldPaid=Number(s.oldPaid)||0; if(t.type==='old_payment') newOldPaid-=Number(t.amount||0); db.collection('shops').doc(s.id).update({ balance:newBal, totalPaid:newTotalPaid, oldPaid:newOldPaid }).then(function(){ return db.collection('transactions').doc(t.id).delete(); }).then(function(){ closeEditPayTx(); closeReport(); alert('Deleted da!'); }); }
+function buildShareText(shop, lang){ var c=calcShop(shop); var last=c.list.slice().sort(function(a,b){ return String(b.date||'').localeCompare(String(a.date||'')); })[0]; if(lang==='tamil') return '🥚 ERAVUR EGG CENTRE\n'+shop.name+' - '+shop.area+'\n----------------\nOld Balance: '+fmt(c.oldRem)+'\nTotal Balance: '+fmt(c.balance)+'\n'+(last?'Last: '+dateStrOf(last):'')+'\nNandri! 🙏'; return '🥚 ERAVUR EGG CENTRE\n'+shop.name+' - '+shop.area+'\n----------------\nOld Balance: '+fmt(c.oldRem)+'\nTotal Balance: '+fmt(c.balance)+'\n'+(last?'Last: '+dateStrOf(last)+' • '+(last.type==='sale'?'Sale '+fmt(last.total):'Paid '+fmt(last.amount)):'')+'\nPlease Pay On Time. Thank You! 🙏'; }
+function openShare(id){ var s=shops.find(function(x){ return x.id===id; }); if(!s) return; curShareId=id; document.getElementById('shareShopName').innerText=s.name+' • Balance: '+fmt(calcShop(s).balance); document.getElementById('sharePreview').innerText=buildShareText(s,'english'); document.getElementById('shareModal').classList.remove('hidden'); }
 function closeShare(){ document.getElementById('shareModal').classList.add('hidden'); }
-function shareEnglish(){ var s = shops.find(function(x){ return x.id===curShareId; }); if(!s) return; window.open('https://wa.me/94' + (s.phone||'').replace(/[^0-9]/g,'').replace(/^0/,'') + '?text=' + encodeURIComponent(buildShareText(s,'english')), '_blank'); }
-function shareTamil(){ var s = shops.find(function(x){ return x.id===curShareId; }); if(!s) return; window.open('https://wa.me/94' + (s.phone||'').replace(/[^0-9]/g,'').replace(/^0/,'') + '?text=' + encodeURIComponent(buildShareText(s,'tamil')), '_blank'); }
-function copyShareText(){ var t = document.getElementById('sharePreview').innerText; if(navigator.clipboard) navigator.clipboard.writeText(t).then(function(){ alert('Copied da! ✅'); }); }
-function showInvoice(){
-  if(!curInvoice) return;
-  var inv = curInvoice; var s = inv.shop;
-  document.getElementById('invNo').innerText = 'INV-' + (inv.id||'').slice(-6).toUpperCase();
-  document.getElementById('invDate').innerText = inv.date;
-  document.getElementById('invShop').innerText = s.name;
-  document.getElementById('invArea').innerText = s.area; document.getElementById('invPhone').innerText = s.phone||'';
-  var h = ''; (inv.items||[]).forEach(function(i){ h += '<tr class="border-b border-dashed"><td class="p-2 font-bold">W'+i.size+' Tray</td><td class="p-2 text-center">'+i.qty+'</td><td class="p-2 text-center">Rs.'+i.rate+'</td><td class="p-2 text-right font-bold">Rs.'+i.amt.toLocaleString('en-LK')+'</td></tr>'; });
-  document.getElementById('invItems').innerHTML = h;
-  document.getElementById('invEggs').innerText = inv.eggs + ' eggs'; document.getElementById('invTotal').innerText = fmt(inv.total);
-  document.getElementById('invOld').innerText = fmt(inv.oldBal); document.getElementById('invTotalBal').innerText = fmt(inv.oldBal + inv.total);
-  document.getElementById('invPaid').innerText = fmt(inv.paid); document.getElementById('invBalance').innerText = fmt(inv.balance);
-  document.getElementById('invoiceModal').classList.remove('hidden');
-}
-function openInvoiceFromTx(tid){
-  var t = tx.find(function(x){ return x.id===tid; }); if(!t) return;
-  var s = shops.find(function(x){ return x.id===t.shopId; }); if(!s) return;
-  // Balance at that time - approximate: current balance for display
-  var c = calcShop(s);
-  curInvoice = { id: t.id, shop: s, date: t.date, items: t.items||[], total: t.total||0, oldBal: c.balance - (t.total||0) + (t.paid||0), paid: t.paid||0, balance: c.balance, eggs: t.eggs||0 };
-  // Fix oldBal for invoice view
-  curInvoice.oldBal = Math.max(0, c.balance - (t.total||0) + (t.paid||0));
-  showInvoice();
-}
+function waLink(phone, msg){ return 'https://wa.me/94'+(phone||'').replace(/[^0-9]/g,'').replace(/^0/,'')+'?text='+encodeURIComponent(msg); }
+function shareEnglish(){ var s=shops.find(function(x){ return x.id===curShareId; }); if(s) window.open(waLink(s.phone, buildShareText(s,'english')),'_blank'); }
+function shareTamil(){ var s=shops.find(function(x){ return x.id===curShareId; }); if(s) window.open(waLink(s.phone, buildShareText(s,'tamil')),'_blank'); }
+function copyShareText(){ var t=document.getElementById('sharePreview').innerText; if(navigator.clipboard) navigator.clipboard.writeText(t).then(function(){ alert('Copied da! ✅'); }); }
+function showInvoice(){ if(!curInvoice) return; var inv=curInvoice, s=inv.shop; document.getElementById('invNo').innerText='INV-'+(inv.id||'').slice(-6).toUpperCase(); document.getElementById('invDate').innerText=inv.date; document.getElementById('invShop').innerText=s.name; document.getElementById('invArea').innerText=s.area; document.getElementById('invPhone').innerText=s.phone||''; var h=''; (inv.items||[]).forEach(function(i){ h+='<tr class="border-b border-dashed"><td class="p-2 font-bold">'+i.size+' Tray</td><td class="p-2 text-center">'+i.qty+'</td><td class="p-2 text-center">Rs.'+i.rate+'</td><td class="p-2 text-right font-bold">Rs.'+i.amt.toLocaleString('en-LK')+'</td></tr>'; }); document.getElementById('invItems').innerHTML=h; document.getElementById('invEggs').innerText=inv.eggs+' eggs'; document.getElementById('invTotal').innerText=fmt(inv.total); document.getElementById('invOld').innerText=fmt(inv.oldBal); document.getElementById('invBalance').innerText=fmt(inv.balance); document.getElementById('invPaid').innerText=fmt(inv.paid); document.getElementById('invoiceModal').classList.remove('hidden'); }
+function openInvoiceFromTx(tid){ var t=tx.find(function(x){ return x.id===tid; }); if(!t) return; var s=shops.find(function(x){ return x.id===t.shopId; }); if(!s) return; var items=[]; if(t.qtys){ sizes.forEach(function(sz){ if(t.qtys[sz]>0) items.push({size:sz, qty:t.qtys[sz], rate:(t.rates&&t.rates[sz])||rates[sz]||0, amt:t.qtys[sz]*sz*((t.rates&&t.rates[sz])||rates[sz]||0)}); }); } else if(t.items) items=t.items; curInvoice={ id:t.id, shop:s, date:dateStrOf(t), items:items, total:t.total||0, oldBal:Math.max(0,(Number(s.balance)||0)-Number(t.total||0)+Number(t.paidNow||t.paid||0)), paid:t.paidNow ?? t.paid ?? 0, balance:Number(s.balance)||0, eggs:t.eggs||0 }; showInvoice(); }
 function closeInvoice(){ document.getElementById('invoiceModal').classList.add('hidden'); }
 function printInvoice(){ printAreaById('invoicePrintArea'); }
-function shareInvoice(){
-  if(!curInvoice) return; var s = curInvoice.shop;
-  var msg = '🥚 ERAVUR EGG CENTRE\n' + s.name + '\nDate: ' + curInvoice.date + '\n' + (curInvoice.items||[]).map(function(i){ return 'W'+i.size+': '+i.qty+' tray = Rs.'+i.amt; }).join('\n') + '\nTotal: ' + fmt(curInvoice.total) + '\nOld: ' + fmt(curInvoice.oldBal) + '\nPaid: ' + fmt(curInvoice.paid) + '\nBalance: ' + fmt(curInvoice.balance);
-  window.open('https://wa.me/94' + (s.phone||'').replace(/[^0-9]/g,'').replace(/^0/,'') + '?text=' + encodeURIComponent(msg), '_blank');
-}
-function showAutoPopup(title, shopName){
-  document.getElementById('autoPopupTitle').innerText = title;
-  document.getElementById('autoPopupShop').innerText = shopName;
-  document.getElementById('autoPopup').classList.remove('hidden');
-}
-function closeAutoPopup(){ document.getElementById('autoPopup').classList.add('hidden'); curAutoData = null; }
-function sendAutoEnglish(){
-  if(!curAutoData) return; var d = curAutoData; var s = d.shop;
-  var msg = d.isPay ? ('🥚 ERAVUR EGG CENTRE\n' + s.name + '\nPaid Received: ' + fmt(d.paid) + '\nDate: ' + d.date + '\nBalance: ' + fmt(d.balance) + '\nThank You! 🙏') : ('🥚 ERAVUR EGG CENTRE\n' + s.name + '\nDate: ' + d.date + '\n' + (d.items||[]).map(function(i){ return 'W'+i.size+': '+i.qty+' tray = Rs.'+i.amt; }).join('\n') + '\nTotal: ' + fmt(d.total) + '\nOld: ' + fmt(d.oldBal) + '\nPaid: ' + fmt(d.paid) + '\nBalance: ' + fmt(d.balance));
-  window.open('https://wa.me/94' + (s.phone||'').replace(/[^0-9]/g,'').replace(/^0/,'') + '?text=' + encodeURIComponent(msg), '_blank'); closeAutoPopup();
-}
-function sendAutoTamil(){
-  if(!curAutoData) return; var d = curAutoData; var s = d.shop;
-  var msg = d.isPay ? ('🥚 ERAVUR EGG CENTRE\n' + s.name + '\nKattinathu: ' + fmt(d.paid) + '\nMeethi: ' + fmt(d.balance) + '\nNandri! 🙏') : ('🥚 ERAVUR EGG CENTRE\n' + s.name + '\n' + (d.items||[]).map(function(i){ return 'W'+i.size+': '+i.qty+' tray'; }).join(' • ') + '\nTotal: ' + fmt(d.total) + '\nMeethi: ' + fmt(d.balance));
-  window.open('https://wa.me/94' + (s.phone||'').replace(/[^0-9]/g,'').replace(/^0/,'') + '?text=' + encodeURIComponent(msg), '_blank'); closeAutoPopup();
-}
-</script><script>
-// ===== V22 - PRICE SETTINGS =====
-function openPriceSettings(){
-  var h = '';
-  sizes.forEach(function(sz){
-    h += '<div class="flex items-center gap-2"><div class="w-16 font-black text-[13px] bg-gray-100 rounded-lg py-3 text-center border-2 border-black">W'+sz+'</div><input id="price'+sz+'" type="number" value="'+(rates[sz]||0)+'" class="flex-1 border-2 border-black rounded-xl p-3 font-bold"><span class="text-[11px] font-black">Rs / egg</span></div>';
-  });
-  document.getElementById('priceInputs').innerHTML = h;
-  document.getElementById('priceModal').classList.remove('hidden');
-}
+function shareInvoice(){ if(!curInvoice) return; var s=curInvoice.shop; var msg='🥚 ERAVUR EGG CENTRE\n'+s.name+'\nDate: '+curInvoice.date+'\n'+(curInvoice.items||[]).map(function(i){ return i.size+': '+i.qty+' tray = Rs.'+i.amt; }).join('\n')+'\nTotal: '+fmt(curInvoice.total)+'\nOld: '+fmt(curInvoice.oldBal)+'\nPaid: '+fmt(curInvoice.paid)+'\nBalance: '+fmt(curInvoice.balance); window.open(waLink(s.phone, msg),'_blank'); }
+function showAutoPopup(title, shopName){ document.getElementById('autoPopupTitle').innerText=title; document.getElementById('autoPopupShop').innerText=shopName; document.getElementById('autoPopup').classList.remove('hidden'); }
+function closeAutoPopup(){ document.getElementById('autoPopup').classList.add('hidden'); curAutoData=null; }
+function sendAutoEnglish(){ if(!curAutoData) return; var d=curAutoData, s=d.shop; var msg=d.isPay?('🥚 ERAVUR EGG CENTRE\n'+s.name+'\nPaid: '+fmt(d.paid)+'\nDate: '+d.date+'\nBalance: '+fmt(d.balance)+'\nThank You! 🙏'):('🥚 ERAVUR EGG CENTRE\n'+s.name+'\nDate: '+d.date+'\n'+(d.items||[]).map(function(i){ return i.size+': '+i.qty+' tray = Rs.'+i.amt; }).join('\n')+'\nTotal: '+fmt(d.total)+'\nOld: '+fmt(d.oldBal)+'\nPaid: '+fmt(d.paid)+'\nBalance: '+fmt(d.balance)); window.open(waLink(s.phone, msg),'_blank'); closeAutoPopup(); }
+function sendAutoTamil(){ if(!curAutoData) return; var d=curAutoData, s=d.shop; var msg=d.isPay?('🥚 ERAVUR EGG CENTRE\n'+s.name+'\nKattinathu: '+fmt(d.paid)+'\nMeethi: '+fmt(d.balance)+'\nNandri! 🙏'):('🥚 ERAVUR EGG CENTRE\n'+s.name+'\n'+(d.items||[]).map(function(i){ return i.size+': '+i.qty+' tray'; }).join(' • ')+'\nTotal: '+fmt(d.total)+'\nMeethi: '+fmt(d.balance)); window.open(waLink(s.phone, msg),'_blank'); closeAutoPopup(); }
+function openPriceSettings(){ var h=''; sizes.forEach(function(sz){ h+='<div class="flex items-center gap-2"><div class="w-16 font-black text-[13px] bg-gray-100 rounded-lg py-3 text-center border-2 border-black">'+sz+'</div><input id="price'+sz+'" type="number" value="'+(rates[sz]||0)+'" class="flex-1 border-2 border-black rounded-xl p-3 font-bold"><span class="text-[11px] font-black">Rs / egg</span></div>'; }); document.getElementById('priceInputs').innerHTML=h; document.getElementById('priceModal').classList.remove('hidden'); }
 function closePriceSettings(){ document.getElementById('priceModal').classList.add('hidden'); }
-function savePriceSettings(){
-  var oldRates = JSON.parse(JSON.stringify(rates));
-  sizes.forEach(function(sz){ rates[sz] = Number(document.getElementById('price'+sz).value)||0; });
-  saveRates();
-  priceHist.unshift({ date: todayStr(), time: new Date().toLocaleTimeString('en-LK'), old: oldRates, new: JSON.parse(JSON.stringify(rates)) });
-  priceHist = priceHist.slice(0, 20);
-  localStorage.setItem('egg_priceHist', JSON.stringify(priceHist));
-  closePriceSettings();
-  alert('Price Saved da! ✅');
-  renderShops();
-}
-function openPriceHistory(){
-  var h = '';
-  if(priceHist.length===0) h = '<p class="text-[11px] font-bold text-gray-500 text-center py-6">History illa da!</p>';
-  priceHist.forEach(function(p){
-    h += '<div class="bg-gray-50 border-2 border-black rounded-xl p-3 mb-2"><div class="font-black text-[12px]">📅 ' + p.date + ' • ' + (p.time||'') + '</div><div class="text-[11px] font-bold mt-1">W30: Rs.' + (p.old[30]||0) + ' → <span class="text-green-600">Rs.' + (p.new[30]||0) + '</span> &nbsp;|&nbsp; W36: Rs.' + (p.old[36]||0) + ' → <span class="text-green-600">Rs.' + (p.new[36]||0) + '</span></div><div class="text-[11px] font-bold">W40: Rs.' + (p.old[40]||0) + ' → <span class="text-green-600">Rs.' + (p.new[40]||0) + '</span> &nbsp;|&nbsp; W45: Rs.' + (p.old[45]||0) + ' → <span class="text-green-600">Rs.' + (p.new[45]||0) + '</span></div></div>';
-  });
-  document.getElementById('priceHistContent').innerHTML = h;
-  document.getElementById('priceHistModal').classList.remove('hidden');
-}
+function savePriceSettings(){ var oldRates=JSON.parse(JSON.stringify(rates)); sizes.forEach(function(sz){ rates[sz]=Number(document.getElementById('price'+sz).value)||0; }); saveRates(); priceHist.unshift({ date:todayStr(), time:new Date().toLocaleTimeString('en-LK'), old:oldRates, new:JSON.parse(JSON.stringify(rates)) }); priceHist=priceHist.slice(0,20); localStorage.setItem('egg_priceHist', JSON.stringify(priceHist)); closePriceSettings(); alert('Price Saved da! ✅'); renderShops(); }
+function openPriceHistory(){ var h=''; if(!priceHist.length) h='<p class="text-center text-[11px] font-bold text-gray-500 py-6">History illa da!</p>'; priceHist.forEach(function(p){ h+='<div class="bg-gray-50 border-2 border-black rounded-xl p-3 mb-2"><div class="font-black text-[12px]">📅 '+p.date+' • '+(p.time||'')+'</div><div class="text-[11px] font-bold mt-1">'+sizes.map(function(sz){ return sz+': Rs.'+(p.old[sz]||0)+' → Rs.'+(p.new[sz]||0); }).join(' | ')+'</div></div>'; }); document.getElementById('priceHistContent').innerHTML=h; document.getElementById('priceHistModal').classList.remove('hidden'); }
 function closePriceHistory(){ document.getElementById('priceHistModal').classList.add('hidden'); }
-// ===== AUTO SETTINGS =====
-function openAutoSettings(){
-  var a = getAutoSettings();
-  document.getElementById('autoSale').checked = !!a.sale;
-  document.getElementById('autoPay').checked = !!a.pay;
-  document.getElementById('autoTamil').checked = !!a.tamil;
-  var el = document.getElementById('setDirectAuto'); if(el) el.checked = !!a.direct;
-  document.getElementById('autoModal').classList.remove('hidden');
-}
+function openAutoSettings(){ var a=getAutoSettings(); document.getElementById('autoSale').checked=!!a.sale; document.getElementById('autoPay').checked=!!a.pay; document.getElementById('autoTamil').checked=!!a.tamil; document.getElementById('autoModal').classList.remove('hidden'); }
 function closeAutoSettings(){ document.getElementById('autoModal').classList.add('hidden'); }
-function saveAutoSettings(){
-  var a = { sale: document.getElementById('autoSale').checked, pay: document.getElementById('autoPay').checked, tamil: document.getElementById('autoTamil').checked, direct: false };
-  var el = document.getElementById('setDirectAuto'); if(el) a.direct = el.checked;
-  localStorage.setItem('egg_auto', JSON.stringify(a));
-  closeAutoSettings();
-  alert('Auto Saved da! ✅');
-}
-function testAutoPopup(){
-  curAutoData = { shop: { name:'Test Kadai', phone:'', area:'Eravur' }, date: todayStr(), items:[{size:30, qty:2, amt:3120}], total:3120, oldBal:0, paid:0, balance:3120 };
-  showAutoPopup('✅ Sale Saved! (Test)', 'Test Kadai');
-}
-// ===== DAILY REPORT =====
-function openDaily(){
-  var today = todayStr();
-  var todays = tx.filter(function(t){ return t.date===today; });
-  var saleTot = 0, payTot = 0, eggs = 0;
-  todays.forEach(function(t){ if(t.type==='sale'){ saleTot += Number(t.total)||0; eggs += Number(t.eggs)||0; } if(t.type==='pay') payTot += Number(t.amount)||0; });
-  var h = '<div class="bg-green-50 border-2 border-black rounded-xl p-3 text-center"><div class="font-black text-[15px]">📅 ' + today + '</div><div class="grid grid-cols-3 gap-2 mt-3"><div class="bg-white border-2 border-black rounded-xl p-2"><div class="text-[10px] font-bold">SALE</div><div class="font-black">' + fmt(saleTot) + '</div></div><div class="bg-white border-2 border-black rounded-xl p-2"><div class="text-[10px] font-bold">PAID</div><div class="font-black text-green-600">' + fmt(payTot) + '</div></div><div class="bg-white border-2 border-black rounded-xl p-2"><div class="text-[10px] font-bold">EGGS</div><div class="font-black">' + eggs + '</div></div></div></div>';
-  h += '<h4 class="font-black text-[12px] mt-4 mb-2">Today - ' + todays.length + ' entries</h4>';
-  if(todays.length===0) h += '<p class="text-[11px] font-bold text-gray-500 text-center py-4">Inniki sale illa da!</p>';
-  todays.forEach(function(t){
-    var s = shops.find(function(x){ return x.id===t.shopId; });
-    if(t.type==='sale') h += '<div class="bg-white border-2 border-black rounded-xl p-3 mb-2 flex justify-between"><div><div class="font-black text-[12px]">🥚 ' + (s?s.name:'') + '</div><div class="text-[11px] font-bold text-gray-600">' + (t.items||[]).map(function(i){ return 'W'+i.size+': '+i.qty; }).join(' • ') + ' • Paid: ' + fmt(t.paid||0) + '</div></div><div class="font-black text-[12px]">' + fmt(t.total) + '</div></div>';
-    else h += '<div class="bg-green-50 border-2 border-black rounded-xl p-3 mb-2 flex justify-between"><div><div class="font-black text-[12px]">💰 ' + (s?s.name:'') + '</div><div class="text-[11px] font-bold text-gray-600">Paid Received</div></div><div class="font-black text-[12px] text-green-600">' + fmt(t.amount) + '</div></div>';
-  });
-  document.getElementById('dailyContent').innerHTML = h;
-  document.getElementById('dailyModal').classList.remove('hidden');
-}
+function saveAutoSettings(){ var a={ sale:document.getElementById('autoSale').checked, pay:document.getElementById('autoPay').checked, tamil:document.getElementById('autoTamil').checked }; localStorage.setItem('egg_auto', JSON.stringify(a)); closeAutoSettings(); alert('Auto Saved da! ✅'); }
+function openDaily(){ var today=todayStr(); var todays=tx.filter(function(t){ return txDateKey(t)===today || dateStrOf(t)===new Date().toLocaleDateString('en-GB'); }); var saleTot=0, payTot=0, eggs=0; todays.forEach(function(t){ if(t.type==='sale'){ saleTot+=Number(t.total)||0; eggs+=Number(t.eggs)||0; } if(t.type==='pay'||t.type==='old_payment'||t.type==='sale_payment') payTot+=Number(t.amount)||0; }); var h='<div class="bg-green-50 border-2 border-black rounded-xl p-3 text-center"><div class="font-black">📅 '+today+'</div><div class="grid grid-cols-3 gap-2 mt-3"><div class="bg-white border-2 border-black rounded-xl p-2"><div class="text-[10px] font-bold">SALE</div><div class="font-black">'+fmt(saleTot)+'</div></div><div class="bg-white border-2 border-black rounded-xl p-2"><div class="text-[10px] font-bold">PAID</div><div class="font-black text-green-600">'+fmt(payTot)+'</div></div><div class="bg-white border-2 border-black rounded-xl p-2"><div class="text-[10px] font-bold">EGGS</div><div class="font-black">'+eggs+'</div></div></div></div>'; if(!todays.length) h+='<p class="text-center text-[11px] font-bold text-gray-500 py-4">Inniki sale illa da!</p>'; todays.forEach(function(t){ var s=shops.find(function(x){ return x.id===t.shopId; }); if(t.type==='sale') h+='<div class="bg-white border-2 border-black rounded-xl p-3 mb-2 flex justify-between"><div><div class="font-black text-[12px]">🥚 '+(s?s.name:'')+'</div><div class="text-[11px] font-bold text-gray-600">'+(t.details||'')+'</div></div><div class="font-black text-[12px]">'+fmt(t.total)+'</div></div>'; else h+='<div class="bg-green-50 border-2 border-black rounded-xl p-3 mb-2 flex justify-between"><div><div class="font-black text-[12px]">💰 '+(s?s.name:'')+'</div><div class="text-[11px] font-bold text-gray-600">Paid</div></div><div class="font-black text-[12px] text-green-600">'+fmt(t.amount)+'</div></div>'; }); document.getElementById('dailyContent').innerHTML=h; document.getElementById('dailyModal').classList.remove('hidden'); }
 function closeDaily(){ document.getElementById('dailyModal').classList.add('hidden'); }
-// ===== ALL REPORT =====
-function openAllReport(){
-  var totSale = 0, totPaid = 0, totBal = 0;
-  var rows = '';
-  shops.slice().sort(function(a,b){ return calcShop(b).balance - calcShop(a).balance; }).forEach(function(s){
-    var c = calcShop(s); totSale += c.saleTotal; totPaid += c.paidTotal + (Number(s.oldPaid)||0); totBal += c.balance;
-    rows += '<div class="flex justify-between items-center bg-white border-2 border-black rounded-xl p-3 mb-2"><div><div class="font-black text-[12px]">' + s.name + '</div><div class="text-[10px] font-bold text-gray-500">' + s.area + ' • Sale: ' + fmt(c.saleTotal) + ' • Paid: ' + fmt(c.paidTotal + (Number(s.oldPaid)||0)) + '</div></div><div class="font-black text-[13px] ' + (c.balance>0?'text-red-600':'text-green-600') + '">' + fmt(c.balance) + '</div></div>';
-  });
-  document.getElementById('allReportContent').innerHTML = '<div class="grid grid-cols-3 gap-2 mb-3"><div class="bg-blue-50 border-2 border-black rounded-xl p-2 text-center"><div class="text-[10px] font-bold">TOTAL SALE</div><div class="font-black text-[12px]">' + fmt(totSale) + '</div></div><div class="bg-green-50 border-2 border-black rounded-xl p-2 text-center"><div class="text-[10px] font-bold">TOTAL PAID</div><div class="font-black text-[12px] text-green-600">' + fmt(totPaid) + '</div></div><div class="bg-red-50 border-2 border-black rounded-xl p-2 text-center"><div class="text-[10px] font-bold">TOTAL BAL</div><div class="font-black text-[12px] text-red-600">' + fmt(totBal) + '</div></div></div>' + rows;
-  document.getElementById('allReportModal').classList.remove('hidden');
-}
+function openAllReport(){ var totSale=0, totPaid=0, totBal=0; var rows=''; shops.slice().sort(function(a,b){ return calcShop(b).balance-calcShop(a).balance; }).forEach(function(s){ var c=calcShop(s); totSale+=c.saleTotal; totPaid+=c.paidTotal; totBal+=c.balance; rows+='<div class="flex justify-between bg-white border-2 border-black rounded-xl p-3 mb-2"><div><div class="font-black text-[12px]">'+s.name+'</div><div class="text-[10px] font-bold text-gray-500">'+s.area+' • Old: '+fmt(c.oldRem)+' • Sale: '+fmt(c.saleTotal)+' • Paid: '+fmt(c.paidTotal)+'</div></div><div class="font-black '+(c.balance>0?'text-red-600':'text-green-600')+'">'+fmt(c.balance)+'</div></div>'; }); document.getElementById('allReportContent').innerHTML='<div class="grid grid-cols-3 gap-2 mb-3"><div class="bg-blue-50 border-2 border-black rounded-xl p-2 text-center"><div class="text-[10px] font-bold">TOTAL SALE</div><div class="font-black text-[12px]">'+fmt(totSale)+'</div></div><div class="bg-green-50 border-2 border-black rounded-xl p-2 text-center"><div class="text-[10px] font-bold">TOTAL PAID</div><div class="font-black text-[12px] text-green-600">'+fmt(totPaid)+'</div></div><div class="bg-red-50 border-2 border-black rounded-xl p-2 text-center"><div class="text-[10px] font-bold">TOTAL BAL</div><div class="font-black text-[12px] text-red-600">'+fmt(totBal)+'</div></div></div>'+rows; document.getElementById('allReportModal').classList.remove('hidden'); }
 function closeAllReport(){ document.getElementById('allReportModal').classList.add('hidden'); }
-// ===== START =====
-document.addEventListener('DOMContentLoaded', function(){
-  var inp = document.getElementById('search'); if(inp) inp.addEventListener('input', renderShops);
-});
 </script>
-</body>
-</html>
+</body></html>
